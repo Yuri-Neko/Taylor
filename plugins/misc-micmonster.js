@@ -13,11 +13,8 @@ let handler = async (m, {
     } else if (m.quoted && m.quoted.text) {
         text = m.quoted.text
     } else throw query
-    let urut = text.split`|`
-    let one = urut[0]
-    let two = urut[1]
-    let three = urut[2]
-    let res = await generateVoice(one, two, three)
+    
+    let res = await generateVoice("id-ID", "id-ID-ArdiNeural", text)
         if (res) await conn.sendMessage(m.chat, {
             audio: res,
             seconds: fsizedoc,
@@ -34,7 +31,7 @@ handler.tags = ["misc"]
 handler.command = /^(micmonster|micmonsterget|micmonsterlist)$/i
 export default handler
 
-async function generateVoice(Locale = "Ardi", Voice = "id-ID-ArdiNeural", Query) {
+async function generateVoice(Locale = "id-ID", Voice = "id-ID-ArdiNeural", Query) {
   const formData = new FormData();
   formData.append("locale", Locale);
   formData.append("content", `<voice name="${Voice}">${Query}</voice>`);
