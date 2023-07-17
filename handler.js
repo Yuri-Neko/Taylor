@@ -1389,7 +1389,7 @@ export async function participantsUpdate({
                         let byeeb = await Leave(pp, thumbnailUrl.getRandom(), names)
                         let welran = [wela, welb].getRandom()
                         let byeran = [byeea, byeeb].getRandom()
-                        await this.sendFile(id, action == "add" ? welran : byeran, '', text + '\n' + action == "add" ? wmwel : wmlea, fakes)
+                        await this.sendFile(id, action == "add" ? welran : byeran, '', text, fakes)
                         /* */
                     }
                 }
@@ -1460,7 +1460,7 @@ export async function deleteUpdate(message) {
         if (chat.antiDelete)
             return
         this.sendMessage(msg.key.remoteJid, {
-            text: `Terdeteksi *@${participant.split`@`[0]}* telah menghapus pesan.\nUntuk mematikan fitur ini, ketik\n*.off antidelete*\n\nUntuk menghapus pesan yang dikirim BOT, reply pesan dengan perintah\n*.delete*`,
+            text: `❗ Terdeteksi *@${participant.split`@`[0]}* telah menghapus pesan.\nUntuk mematikan fitur ini, ketik\n*.off antidelete*\n\nUntuk menghapus pesan yang dikirim BOT, reply pesan dengan perintah\n*.delete*`,
             mentions: [participant]
         }, {
             quoted: msg
