@@ -88,12 +88,12 @@ const listMessage = {
       throw false
   }
   
-  conn.send2ButtonDoc(m.chat, `*${htki} OPTIONS ${htka}*
+  conn.reply(m.chat, `*${htki} OPTIONS ${htka}*
 🗂️ *Type:* ${type} 
 📊 *Status:* Succes ✅
 🎚️ *Options:* ${isEnable ? 'Enable' : 'Disable'}
 📣 *For:* ${isAll ? 'This Bot' : isUser ? '' : 'This Chats'}
-`, author, `${isEnable ? '✖️ Disable' : '✔️ Enable'}`, `${isEnable ? `.off ${type}` : `.on ${type}`}`, '🎀 Menu', '.menu', fakes, adReply)
+`, m)
 }
 handler.help = ['ephe'].map(v => v + ' <option>')
 handler.tags = ['group', 'owner']

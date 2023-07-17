@@ -146,6 +146,7 @@ let handler = async function(m, {
     age = parseInt(age)
     if (age > 30) throw "*Gak boleh!*,\nTua amat dah 🗿"
     if (age < 5) throw "*Gak boleh!*,\nBanyak pedo 🗿"
+    if (user.name && user.name.trim() === name.trim()) throw "Nama sudah dipakai"
     user.name = name.trim()
     user.age = age
     user.regTime = +new Date
@@ -162,7 +163,7 @@ ${dmenuf}
 ᴅᴀᴛᴀ ᴜsᴇʀ ʏᴀɴɢ ᴛᴇʀsɪᴍᴘᴀɴ ᴅɪᴅᴀᴛᴀʙᴀsᴇ ʙᴏᴛ, ᴅɪᴊᴀᴍɪɴ ᴀᴍᴀɴ ᴛᴀɴᴘᴀ ᴛᴇʀsʜᴀʀᴇ (. ❛ ᴗ ❛.) ${cmenua}
 `
     //Sukses
-    await conn.sendFile(m.sender, flaaa.getRandom() + "VERIFIED", "", cap, m)
+    await conn.sendFile(m.chat, flaaa.getRandom() + "VERIFIED", "", cap, m)
 }
 handler.help = ["daftar", "register"].map(v => v + " <nama>.<umur>")
 handler.tags = ["xp"]

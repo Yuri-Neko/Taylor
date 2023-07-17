@@ -15,19 +15,19 @@ if (args[1] == 'a') {
   let res = await fetch(`https://api.lolhuman.xyz/api/tiktok?apikey=${global.lolkey}&url=${args[0]}`)
     let json = await res.json()
     let txt = `🚀 *Link:* ${await(await axios.get(`https://tinyurl.com/api-create.php?url=${args[0]}`)).data}` 
-    conn.send2ButtonVid(m.chat, json.result.link, txt, wm, `No Wm`, `.tiktoknowm ${args[0]}`, `Audio`, `.tiktokaudio ${args[0]}`, m)
+    conn.sendFile(m.chat, json.result.link, '', txt, m)
     }
     if (args[1] == 'b') {
     let res = await fetch(`https://api.lolhuman.xyz/api/tiktok2?apikey=${global.lolkey}&url=${args[0]}`)
     let json = await res.json()
     let txt = `🚀 *Link:* ${await(await axios.get(`https://tinyurl.com/api-create.php?url=${args[0]}`)).data}` 
-    conn.send2ButtonVid(m.chat, json.result.link, txt, wm, `No Wm`, `.tiktoknowm ${args[0]}`, `Audio`, `.tiktokaudio ${args[0]}`, m)
+    conn.sendFile(m.chat, json.result.link, '', txt, m)
     }
     if (args[1] == 'c') {
     let res = await fetch(`https://api.lolhuman.xyz/api/tiktok3?apikey=${global.lolkey}&url=${args[0]}`)
     let json = await res.json()
     let txt = `🚀 *Link:* ${await(await axios.get(`https://tinyurl.com/api-create.php?url=${args[0]}`)).data}` 
-    conn.send2ButtonVid(m.chat, json.result.link, txt, wm, `No Wm`, `.tiktoknowm ${args[0]}`, `Audio`, `.tiktokaudio ${args[0]}`, m)
+    conn.sendFile(m.chat, json.result.link, '', txt, m)
     }
     } catch (e) {
     throw eror

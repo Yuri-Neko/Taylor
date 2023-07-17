@@ -42,7 +42,7 @@ Thanks dah invite Gua *${m.name}*`, fkonn, {
 Untuk menggunakan *${conn.user.name}* silahkan ketik
 #menu
 @${conn.user.jid.split('@')[0]} akan keluar secara otomatis setelah *${msToDate(global.db.data.chats[res].expired - now)}*`
-  await conn.send2Button(res, mes, wm, null, [[`Owner`, `.owner`], [`Menu`, `${usedPrefix}menu`]], fkonn, {
+  await conn.reply(res, mes, fkonn, {
         mentions: d
          })
      })

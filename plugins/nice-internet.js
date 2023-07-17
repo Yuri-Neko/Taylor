@@ -24,7 +24,7 @@ let handler = async (m, { conn, args, usedPrefix, text, command }) => {
 *📒Title:* ${cer.desc}
 
 `.trim()
-conn.send2ButtonVid(m.chat, cer.watermark, cap, author, `No Wm`, `.get ${cer.nowm}`, `Audio`, `.get ${cer.audio}`, fakes, adReply)
+conn.sendFile(m.chat, cer.watermark, '', cap, m)
 	}
 	if (command == 'nicewiki') {
 	let cer = await ngewiki(text)

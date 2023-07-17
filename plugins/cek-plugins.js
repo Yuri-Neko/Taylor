@@ -12,14 +12,14 @@ let spas = "                "
 
 try {
     let { total, success, last, lastSuccess } = global.db.data.stats[text + '.js']
-    conn.send2Button(m.chat, `
+    conn.reply(m.chat, `
 📑 *Plugins:* ${args[0]}
 *💬 Total :* ${total}
 *✔️ Succes :* ${success}
 ${readMore}
 *🕔 Last time used:* ${new Date(last)}
 *🕔 Last time it worked:* ${new Date(lastSuccess)}
-`, global.botdate, 'INFO', 'info', 'OWNER', '.owner', m)
+`, m)
 } catch (e) {
 throw eror
 }

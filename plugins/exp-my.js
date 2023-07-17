@@ -116,7 +116,7 @@ let handler = async (m, { conn }) => {
 ⏰ *ᴇxᴘɪʀᴇᴅ:*
 ${clockString(user.premiumTime - new Date() * 1)}`: ''}
 `.trim()
-  conn.send2ButtonDoc(m.chat, `${htki} ᴜ s ᴇ ʀ s ${htka}`, caption, `ɪɴᴠᴇɴᴛᴏʀʏ`, '.inv', 'ℹ️ Menu', '.menu', fakes, adReply)
+  conn.reply(m.chat, `${htki} ᴜ s ᴇ ʀ s ${htka}\n` + caption, m)
 
 }
 handler.help = ['my']

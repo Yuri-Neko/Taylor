@@ -10,7 +10,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 *filesize:* ${res.filesize}
 *upload:* ${res.upload}
 *link:* ${res.link}`
- if (res.link) return conn.send2ButtonDoc(m.chat, done, author, '🔖 Get', usedPrefix + 'get ' + res.link, 'ℹ️ Menu', '.menu', fakes, adReply)
+ if (res.link) return conn.sendFile(m.chat, res.link, '', done, m)
  else throw eror
 }
 handler.help = ['zippyshare'].map(v => v + ' <url>')

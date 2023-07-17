@@ -21,7 +21,7 @@ let logs = `➯ Pᴇsᴀɴ : ${pesan}`
 let ssn = `〠 Dᴀʀɪ : ${name}\n⎙ Pᴇsᴀɴ : ${pesan}`
         let imgr = fla.getRandom()
         //Created By AL? Offc
-       await conn.send2ButtonDoc(data.jid, tek, ssn, 'Balas', '.balasmenfess', 'Owner', '.owner', m, { contextInfo: { externalAdReply: { showAdAttribution: true,
+       await conn.reply(data.jid, tek + '\n' + ssn, m, { contextInfo: { externalAdReply: { showAdAttribution: true,
     mediaUrl: sig,
     mediaType: 2, 
     description: sgc,
@@ -30,7 +30,7 @@ let ssn = `〠 Dᴀʀɪ : ${name}\n⎙ Pᴇsᴀɴ : ${pesan}`
     thumbnail: fs.readFileSync('./thumbnail.jpg'),
     sourceUrl: sgc
    }}}).then(() => {
-           conn.send2ButtonDoc(m.chat, `Bᴇʀʜᴀsɪʟ Mᴇɴɢɪʀɪᴍ Pᴇsᴀɴ Kᴇ @${jid.replace(/@.+/, '')}`, logs, 'Menu', '.menu', 'Owner', '.owner', m, { contextInfo: { externalAdReply: { showAdAttribution: true,
+           conn.reply(m.chat, `Bᴇʀʜᴀsɪʟ Mᴇɴɢɪʀɪᴍ Pᴇsᴀɴ Kᴇ @${jid.replace(/@.+/, '')}` + '\n' + logs, m, { contextInfo: { externalAdReply: { showAdAttribution: true,
     mediaUrl: sfb,
     mediaType: 2, 
     description: sgc,

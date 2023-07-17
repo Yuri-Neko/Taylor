@@ -22,12 +22,14 @@ ${item.map(v => `${rpg.emoticon(v)}${v}`.trim()).join('\n')}
     if (!who) return m.reply('Tag salah satu, atau ketik Nomernya!!')
     if (!(who in global.db.data.users)) return m.reply(`User ${who} not in database`)
     if (user[type] * 1 < count) return m.reply(`Your *${rpg.emoticon(type)}${type}${special(type)}* is less *${count - user[type]}*`)
+                let txt = `Apakah Anda yakin ingin melakukan transfer ✅ (Yes) ❌ (No)\n\n`
     let confirm = `
 *––––––『 TRANSFER 』––––––*
 *🗂️ Type:* ${type} ${rpg.emoticon(type)}${special(type)}
 *🧮 Count:* ${count} 
 *📨 To:* @${(who || '').replace(/@s\.whatsapp\.net/g, '')}
 
+${txt}
 ⏰ Timeout *60* detik
 `.trim()
     let c = wm
