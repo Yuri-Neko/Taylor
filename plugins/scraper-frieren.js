@@ -8,7 +8,6 @@ import {
     doujindesu,
     facebook,
     h5tuqq,
-    hentaiHaven,
     instagram,
     komikuId,
     music,
@@ -41,7 +40,6 @@ let handler = async (m, {
         "doujindesu",
         "facebook",
         "h5tuqq",
-        "hentaiHaven",
         "instagram",
         "komikuId",
         "music",
@@ -173,23 +171,7 @@ let handler = async (m, {
             let outs = await h5tuqq(inputs)
             throw outs
         }
-        if (feature == "hentaiHaven") {
-            let hth = [
-                "search",
-                "detail"
-            ]
-            if (!hth.includes(inputs)) return m.reply("*Example:*\n.fs youtube.search.hello\n\n*Pilih type yg ada*\n" + hth.map((v, index) => "  ○ " + v).join('\n'))
-            if (inputs == "search") {
-                await m.reply(wait)
-                let outs = await hentaiHaven.search(inputs_)
-                throw outs
-            }
-            if (inputs == "detail") {
-                await m.reply(wait)
-                let outs = await hentaiHaven.detail(inputs_)
-                throw outs
-            }
-        }
+       
         if (feature == "instagram") {
             await m.reply(wait)
             let outs = await instagram.v1(inputs)

@@ -13,7 +13,6 @@ import {
     bucinjson,
     caklontong,
     chord,
-    cnbindonesia,
     createHash,
     dare,
     darejson,
@@ -118,7 +117,6 @@ let handler = async (m, {
         "bucinjson",
         "caklontong",
         "chord",
-        "cnbindonesia",
         "createHash",
         "dare",
         "darejson",
@@ -260,10 +258,7 @@ let handler = async (m, {
             let res = await chord(kodes)
             throw res
         }
-        if (modes == "cnbindonesia") {
-            let res = await cnbindonesia(kodes)
-            throw res
-        }
+        
         if (modes == "createHash") {
             let res = await createHash(kodes)
             throw res

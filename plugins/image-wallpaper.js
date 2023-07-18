@@ -1,4 +1,4 @@
-import { wallpaper, wallpaperv2 } from '@bochilteam/scraper'
+import { wallpaper } from '@bochilteam/scraper'
 import fetch from 'node-fetch'
 let handler = async (m, { conn, text, usedPrefix, command }) => {
 let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender
@@ -101,7 +101,7 @@ let arr_url = ["aesthetic",
         ]])
 	})
 	if (!text) return conn.sendList(m.chat, htki + " 📺 Models 🔎 " + htka, `⚡ Silakan pilih Model di tombol di bawah...\n*Teks yang anda kirim:* ${text}\n\nKetik ulang *${usedPrefix + command}* teks anda untuk mengubah teks lagi`, author, "☂️ M O D E L ☂️", listSections, m)
-    const res = await (/2/.test(command) ? wallpaperv2 : wallpaper)(text)
+    const res = await (/2/.test(command) ? wallpaper : wallpaper)(text)
     const img = res[Math.floor(Math.random() * res.length)]
     await conn.sendFile(m.chat, await(await fetch(img)).buffer(), '', `Result from *${text}*`, m)
 }
