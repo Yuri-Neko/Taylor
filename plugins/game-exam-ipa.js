@@ -1,4 +1,3 @@
-import jimp from 'jimp'
 
 let handler = async (m, { conn }) => {
 	let from = m.chat
@@ -489,20 +488,9 @@ let handler = async (m, { conn }) => {
 		let list = data
 		let random = Math.floor(Math.random() * list.length);
 		let json = list[random]
-	let buttons = [
-			{ buttonId: json.a, buttonText: { displayText: 'A'}, type: 1 }, 
-			{ buttonId: json.b, buttonText: { displayText: 'B'}, type: 1 },
-			{ buttonId: json.c, buttonText: { displayText: 'C'}, type: 1 } 
-			]
-	let buttonMessage = {
-			location: { jpegThumbnail: await reSize('https://user-images.githubusercontent.com/72728486/195973599-a140a181-6ac5-414c-a79d-9cb7197cd6a9.jpg', 300, 175)},
-			caption: json.soal + '\nA. ' + json.a + '\nB. ' + json.b + '\nC. ' + json.c,
-			footer: 'Waktumu 1 menit untuk menjawab' + '\nSoal tingkat ' + json.tingkat,
-			buttons: buttons,
-				headerType: 4
-			}
+	
 conn.exam[from] = [
-			await conn.sendMessage(m.chat, buttonMessage),
+			await conn.sendMessage(m.chat, { text: json.soal + '\nA. ' + json.a + '\nB. ' + json.b + '\nC. ' + json.c + '\n\n' + 'Waktumu 1 menit untuk menjawab' + '\nSoal tingkat ' + json.tingkat }, { quoted: m }),
 			json.jawaban,
 			setTimeout(() => {
 				conn.sendMessage(m.chat, { text: 'Waktu habis'}, { quoted: conn.exam[from][0]})
@@ -518,12 +506,6 @@ conn.exam[from] = [
 
 handler.tags = ['game']
 handler.command = /^examipa$/i
-handler.help = ['ExamIpa']
+handler.help = ['examIpa']
 
 export default handler
-
-const reSize = async (image, width, height) => {
-			  var read = await jimp.read(image);
-			  var data = await read.resize(width, height).getBufferAsync(jimp.MIME_JPEG)
-			  return data
-      }

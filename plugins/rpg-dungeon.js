@@ -1,4 +1,4 @@
-let { MessageType } = (await import('@adiwajshing/baileys')).default
+
 import fetch from 'node-fetch'
 
 let handler = async(m, { conn, usedPrefix, command, text }) => {
@@ -16,13 +16,8 @@ let handler = async(m, { conn, usedPrefix, command, text }) => {
         if (HEALT) buttons.push({buttonId: `.heal`, buttonText: {displayText: 'ʜᴇᴀʟ'}, type: 1})
         
         let lmao = item(user.sword * 1, user.armor * 1, user.health * 1, usedPrefix)
-        if (buttons.length == 0) return m.reply(lmao)   
-        const buttonMessage = {
-            contentText: `*${htki} DUNGEON ${htka}*`,
-            footerText: lmao,
-            buttons: buttons,
-            headerType: 1
-        }
+        if (buttons.length == 0) return m.reply(lmao + buttons.map((v) => v.buttonId).join('\n')
+
         return conn.reply(m.chat, lmao, false, { quoted: m} )// nak durung menuhi syarat
     }
     global.dungeon = global.dungeon ? global.dungeon : {}
@@ -54,17 +49,9 @@ let handler = async(m, { conn, usedPrefix, command, text }) => {
         room.state = 'PLAYING'
       }
         
-       const buttons = [
-           {buttonId: 'id1', buttonText: {displayText: 'gass..'}, type: 1}
-       ]
-        
+       
         let lmao = `${!room.game.player4 ? `[• • •] ᴡᴀɪᴛɪɴɢ ${!room.game.player3 && !room.game.player4 ? '2' : '1'} ᴘʟᴀʏᴇʀ ᴀɢᴀɪɴ... ${room.name ? `\n➞ ᴛʏᴘᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ғᴏʀ ᴊᴏɪɴ *${usedPrefix}${command} ${room.name}*` : ''}` : 'ᴀʟʟ ᴘʟᴀʏᴇʀ ᴀʀᴇ ᴄᴏᴍᴘʟᴀᴛᴇ...'}`
-        const buttonMessage = {
-            contentText: `*${htki} DUNGEON ${htka}*`,
-            footerText: lmao,
-            buttons: buttons,
-            headerType: 1
-        }
+
         conn.reply(m.chat, `*${htki} DUNGEON ${htka}*\n` + lmao, m)
         
         if (room.game.player1 && room.game.player2 && room.game.player3 && room.game.player4) {
@@ -341,19 +328,12 @@ let handler = async(m, { conn, usedPrefix, command, text }) => {
             }
         }
         if (text) room.name = text
-        const buttons = [
-            {buttonId: 'id1', buttonText: {displayText: 'sendiri'}, type: 1}
-        ]
+     
         
         let lmao = '[ • • • ] ᴡᴀɪᴛɪɴɢ ᴘʟᴀʏᴇʀ ' + (text ? `ᴛʏᴘᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ
 *${usedPrefix}${command} ${text}*` : '') + '\nᴏʀ ᴛʏᴘᴇ *sendiri* ᴛᴏ ᴘʟᴀʏ sᴏʟᴏ'
-        const buttonMessage = {
-            contentText: `*${htki} WAITING ${htka}*`,
-            footerText: lmao,
-            buttons: buttons,
-            headerType: 1
-        }
-        conn.reply(m.chat, `*${htki} DUNGEON ${htka}*\n` + lmao, m)
+        
+        conn.reply(m.chat, `*${htki} WAITING ${htka}*\n` + lmao, m)
         global.dungeon[room.id] = room
       }
 }
@@ -378,19 +358,11 @@ handler.before = function (m) {
     if (room.game.player4) PLAYER.push(room.game.player4)
     let P = data(PLAYER)
     if (/^(sendiri|dewean)$/i.test(m.text.toLowerCase())) {
-        const buttons = [
-            {buttonId: 'id1', buttonText: {displayText: 'gass..'}, type: 1}
-        ]
+        
         
         let lmao = '! ʏᴏᴜ ᴄᴀɴ\'ᴛ ᴘʟᴀʏ sᴏʟᴏ ʙᴇᴄᴀᴜsᴇ ʏᴏᴜ ᴀʟʀᴇᴀᴅʏ ʜᴀᴠᴇ ᴀ ᴘᴀʀᴛɴᴇʀ\n➞ ᴘʟᴇᴀsᴇ ᴛʏᴘᴇ *gass* ᴛᴏ ᴘʟᴀʏ ᴡɪᴛʜ ᴏᴛʜᴇʀ ᴘᴀʀᴛɴᴇʀs...'
-        const buttonMessage = {
-          contentText: `*${htki} INFO ${htka}*`,
-          footerText: lmao,
-          buttons: buttons,
-          headerType: 1
-      }
-  
-      if (room.player2 || room.player3 || room.player4) return this.sendMessage(m.chat, buttonMessage, MessageType.buttonsMessage)
+        
+      if (room.player2 || room.player3 || room.player4) return this.reply(m.chat, lmao, m)
       room.state = 'PLAYING'
       let str = `
 *➞ ʀᴏᴏᴍ ɪᴅ:* ${room.id}

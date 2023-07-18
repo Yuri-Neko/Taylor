@@ -46,7 +46,7 @@ untuk mendapatkannya ketik *${usedPrefix}craft fishingrod*`
                         buttons: buttons,
                         headerType: 1
                     }
-                    return conn.sendMessage(m.chat, buttonMessage, { quoted: m })
+                    return conn.sendMessage(m.chat, { text: lmao }, { quoted: m })
                 }
                 if (fishingrod > 9) return conn.reply(m.chat, `*${rpg.emoticon('fishingrod')}FishingRod* kamu sudah level max`, m)
                 let _kayu = fishingrod * 25
@@ -74,7 +74,7 @@ untuk memilikinya ketik *${usedPrefix}craft Pickaxe*`
                         buttons: buttons,
                         headerType: 1
                     }
-                    return conn.sendMessage(m.chat, buttonMessage, { quoted: m })
+                    return conn.sendMessage(m.chat, { text: lmao }, { quoted: m })
                 }
                 if (pickaxe > 9) return conn.reply(m.chat, `*${rpg.emoticon('pickaxe')}Pickaxe* kamu sudah level max!!`, m)
                 let __batu = pickaxe * 25
@@ -104,7 +104,7 @@ untuk memilikinya ketik *${usedPrefix}craft sword*`
                         buttons: buttons,
                         headerType: 1
                     }
-                    return conn.sendMessage(m.chat, buttonMessage, { quoted: m })
+                    return conn.sendMessage(m.chat, { text: lmao }, { quoted: m })
                 }
                 if (sword > 9) return conn.reply(m.chat, `*${rpg.emoticon('sword')}Sword* kamu sudah level max!!`, m)
                 let _iron = sword * 25
@@ -122,7 +122,7 @@ ${iron < _iron ? `\n${rpg.emoticon('iron')}Iron kamu kurang *${_iron - iron}*` :
                 conn.reply(m.chat, `Succes mengupgrade *${rpg.emoticon('sword')}Sword*`, m)
                 break
             default :
-                return conn.sendMessage(m.chat, buttonMessage1, { quoted: m })
+                return conn.sendMessage(m.chat, { text: lmao1 }, { quoted: m })
         }
     } catch (e) {
         console.log(e)

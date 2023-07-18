@@ -5,18 +5,10 @@ let handler = async(m, { conn, text, usedPrefix, command }) => {
 
   await m.reply('Searching...')
     let res = await sandroid1(text)
-    let dapet = res.data
-	let row = Object.values(dapet).map((v, index) => ({
-		title: v.judul,
-		description: '\n⌚ dev: ' + v.dev + '\n⏲️ rating: ' + v.rating + '\n👁️ thumb: ' + v.thumb + '\n📎 link: ' + v.link,
-		rowId: usedPrefix + 'ss ' + v.link
-	}))
-	let button = {
-		buttonText: `☂️ apkpure Search Disini ☂️`,
-		description: `⚡ Silakan pilih apkpure Search di tombol di bawah...\n*Teks yang anda kirim:* ${text}\n\nKetik ulang *${usedPrefix + command}* teks anda untuk mengubah teks lagi`,
-		footerText: wm
-	}
-	return await conn.sendListM(m.chat, button, row, m)
+    let teks = res.data.map((v, index) => {
+                    return v.judul + '\n⌚ dev: ' + v.dev + '\n⏲️ rating: ' + v.rating + '\n👁️ thumb: ' + v.thumb + '\n📎 link: ' + v.link
+                }).filter(v => v).join("\n\n________________________\n\n")
+                await m.reply(teks)
 }
 handler.help = ['apkpure'].map(v => v + ' <query>')
 handler.tags = ['tools']
