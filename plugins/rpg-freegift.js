@@ -12,7 +12,7 @@ let handler = async(m, { conn, args, usedPrefix }) => {
     global.db.data.users[m.sender].lastclaim = new Date * 1
 } else conn.reply(m.chat, '[❗] Kode Gift Gratis hanya dapat digunakan sehari sekali ! dan kode hanya bisa di pakai sekali !\n\nKetik *!buygift* untuk membeli kodegift premium', m)
    } else {
-        conn.reply(m.chat, `*「 KODE FREE TIDAK VALID 」*\n\nSilahkan daftar terlebih dahulu untuk mendapatkan kodegift gratis!\n\nKetik !daftar namamu|umurmu`, m)
+        conn.reply(m.chat, `*「 KODE FREE TIDAK VALID 」*`, m)
     }
 }
 handler.help = ['freegift <kode>']

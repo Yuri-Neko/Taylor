@@ -8,8 +8,10 @@ let handler = async (m, { conn, command, usedPrefix }) => {
         conn.reply(m.chat, 'Masih ada soal belum terjawab di chat ini', conn.tebaklogo[id][0])
         throw false
     }
-    let res = await fetch(`https://api.akuari.my.id/games/tebakapp`)
-    let json = await res.json()
+    let res = await fetch(`https://raw.githubusercontent.com/orderku/db/main/dbbot/game/tebakapp.json`)
+    let src = await res.json()
+    let Apps = src[Math.floor(Math.random() * src.length)]
+    let json = { hasil: Apps }
     let caption = `*${command.toUpperCase()}*
 Logo apakah ini?
 

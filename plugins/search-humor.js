@@ -25,19 +25,44 @@ let handler = async (m, {
             await m.reply(wait)
             let outs = await getMeme()
             let output = Object.entries(outs).map(([key, value]) => `  ○ *${key.toUpperCase()}:* ${value}`).join('\n');
-        await m.reply(output);
+        await conn.sendMessage(m.chat, {
+                    image: {
+                        url: outs.url
+                    },
+                    caption: output
+                }, {
+                    quoted: m
+                })
         }
         if (modes == "jokes") {
             await m.reply(wait)
             let outs = await getJoke()
             let output = Object.entries(outs).map(([key, value]) => `  ○ *${key.toUpperCase()}:* ${value}`).join('\n');
-        await m.reply(output);
+        await conn.sendMessage(m.chat, {
+                    image: {
+                        url: outs.url
+                    },
+                    caption: output
+                }, {
+                    quoted: m
+                })
         }
         if (modes == "gif") {
             await m.reply(wait)
-            let outs = await getGifs(kodes)
+            if (!kodes) return m.reply("Input Query")
+            let data = await getGifs(kodes)
+            let outs = data.images[Math.floor(Math.random() * data.images.length)];
             let output = Object.entries(outs).map(([key, value]) => `  ○ *${key.toUpperCase()}:* ${value}`).join('\n');
-        await m.reply(output);
+        await conn.sendMessage(m.chat, {
+                    video: {
+                        url: outs.url
+                    },
+                    gifPlayback: true,
+                    gifAttribution: ~~(Math.random() * 2),
+                    caption: output
+                }, {
+                    quoted: m
+                })
         }
     }
 

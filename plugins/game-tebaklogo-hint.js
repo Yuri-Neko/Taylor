@@ -5,7 +5,7 @@ let handler = async (m, { conn }) => {
     let json = conn.tebaklogo[id][1]
     conn.reply(m.chat, '```' + json.hasil.data.jawaban.replace(/[AIUEOaiueo]/ig, '_') + '```', m)
 }
-handler.command = /^hani$/i
+handler.command = /^hlog$/i
 
 handler.limit = true
 

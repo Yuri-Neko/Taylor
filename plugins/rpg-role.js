@@ -1,6 +1,4 @@
-let handler = m => m
-
-handler.before = function (m) {
+let handler = async (m, { conn }) => {
   let user = global.db.data.users[m.sender]
         let role = (user.level <= 2) ? 'Newbie ㋡'
           : ((user.level >= 2) && (user.level <= 4)) ? 'Beginner Grade 1 ⚊¹'
@@ -63,11 +61,10 @@ handler.before = function (m) {
           : ((user.level >= 900) && (user.level <= 1000)) ? 'Legendary忍忍忍忍'
           : 'Master 숒 × Legendary 숒'
   user.role = role
-  return true
+  await conn.reply(m.chat, "*Kamu adalah:* " + user.role, m)
 }
-
-export default handler 
 handler.help = ['role']
 handler.tags = ['info']
 handler.command = /^(role|levelrole)$/i
 handler.register = true
+export default handler

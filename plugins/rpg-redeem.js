@@ -1,4 +1,4 @@
-const cooldown = 86800000
+const cooldown = 86400000
 let handler = async(m, { conn, args, usedPrefix }) => {
 let user = global.db.data.users[m.sender]
 let ctimer = (new Date - user.lastcode)

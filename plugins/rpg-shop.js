@@ -408,30 +408,32 @@ let imgr = flaaa.getRandom()
 )
     footer = (command.toLowerCase() == 'buy' ?
 (`
-🔖 ɪᴛᴇᴍs ʟɪsᴛ :
-${Object.keys(listItems).map((v) => {
-        let paymentMethod = Object.keys(listItems[v]).find(v => v in user)
-        return `⮕ 1 ${global.rpg.emoticon(v)}${v} ﹫ ${listItems[v][paymentMethod]} ${global.rpg.emoticon(paymentMethod)}${paymentMethod}`.trim()
-    }).join('\n')}
-–––––––––––––––––––––––––
 💁🏻‍♂ ᴛɪᴩ :
 ⮕ ᴛᴏ ʙᴜʏ ɪᴛᴇᴍs:
-${usedPrefix}${command} [item] [quantity]
+${usedPrefix}${command} *[item] [quantity]*
 ★ ᴇxᴀᴍᴩʟᴇ:
-${usedPrefix}${command} potion 10
-`.trim()) : 
-(`
+${usedPrefix}${command} *potion 10*
+
+–––––––––––––––––––––––––
 🔖 ɪᴛᴇᴍs ʟɪsᴛ :
 ${Object.keys(listItems).map((v) => {
         let paymentMethod = Object.keys(listItems[v]).find(v => v in user)
-        return `⮕ 1 ${global.rpg.emoticon(v)}${v} ﹫ ${listItems[v][paymentMethod]} ${global.rpg.emoticon(paymentMethod)}${paymentMethod}`.trim()
+        return `👉 1 ${global.rpg.emoticon(v)}${v} ﹫ ${listItems[v][paymentMethod]} ${global.rpg.emoticon(paymentMethod)}${paymentMethod}`.trim()
     }).join('\n')}
-–––––––––––––––––––––––––
+`.trim()) : 
+(`
 💁🏻‍♂ ᴛɪᴩ :
 ⮕ ᴛᴏ sᴇʟʟ ɪᴛᴇᴍs:
-${usedPrefix}${command} [item] [quantity]
+${usedPrefix}${command} *[item] [quantity]*
 ★ ᴇxᴀᴍᴩʟᴇ:
-${usedPrefix}${command} potion 10
+${usedPrefix}${command} *potion 10*
+
+–––––––––––––––––––––––––
+🔖 ɪᴛᴇᴍs ʟɪsᴛ :
+${Object.keys(listItems).map((v) => {
+        let paymentMethod = Object.keys(listItems[v]).find(v => v in user)
+        return `👉 1 ${global.rpg.emoticon(v)}${v} ﹫ ${listItems[v][paymentMethod]} ${global.rpg.emoticon(paymentMethod)}${paymentMethod}`.trim()
+    }).join('\n')}
 `.trim())
 )
     image = (command.toLowerCase() == 'buy' ?
@@ -450,7 +452,7 @@ ${usedPrefix}${command} potion 10
 )
     const item = (args[0] || '').toLowerCase()
     const total = Math.floor(isNumber(args[1]) ? Math.min(Math.max(parseInt(args[1]), 1), Number.MAX_SAFE_INTEGER) : 1) * 1
-    if (!listItems[item]) return conn.sendFile(m.chat, image, '', text, m)
+    if (!listItems[item]) return conn.sendFile(m.chat, image, '', text + '\n' + footer, m)
     if (command.toLowerCase() == 'buy') {
         let paymentMethod = Object.keys(listItems[item]).find(v => v in user)
         if (user[paymentMethod] < listItems[item][paymentMethod] * total) return conn.sendFile(m.chat, imgr + 'lowcredit',

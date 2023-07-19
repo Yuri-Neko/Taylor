@@ -1,5 +1,6 @@
-let handler = async (m, { conn }) => {
+let handler = async (m, { conn, command }) => {
   let user = global.db.data.users[m.sender]
+  let imgr = flaaa.getRandom()
   const caption = `
 ${htki} *B A N K  U S E R* ${htka}
 ${dmenub} 📛 *Name:* ${user.registered ? user.name : conn.getName(m.sender)}
@@ -12,7 +13,7 @@ ${dmenub} 📑 *Registered:* ${user.registered ? 'Yes':'No'}
 ${dmenuf}
 `.trim()
   
-  await conn.sendFile(m.chat, 'https://telegra.ph/file/0451b07945f7f9633b59b.jpg', "", caption, m)
+  await conn.sendFile(m.chat, imgr + command, "", caption, m)
 }
 handler.help = ['bank']
 handler.tags = ['rpg']
