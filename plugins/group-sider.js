@@ -43,9 +43,9 @@ await conn.sendPresenceUpdate('composing', m.chat)
 }
 handler.help = ['gcsider']
 handler.tags = ['group']
-handler.command = /^(gcsider)$/i
+handler.command = /^(gcsider|sider|getsider)$/i
 handler.group = true
-
+handler.admin = true 
 export default handler
 
 const more = String.fromCharCode(8206)

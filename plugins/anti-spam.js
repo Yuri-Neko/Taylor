@@ -41,6 +41,7 @@ export async function all(m) {
                     this.reply(m.chat, "⚠️ Kamu sudah dibanned karena mendapatkan 5 warn", m, {
                         mentions: [pengirim]
                     });
+                    await this.updateBlockStatus(m.sender, "block")
                 }
                 this.spam[pengirim] = {
                     count: 1,

@@ -14,7 +14,7 @@ let text
         text = m.quoted.text
     } else throw "Input teks atau reply teks yang ingin di jadikan quote!"
    await m.reply(wait)
-   if (text.length > 30) return m.reply('Maksimal 30 Teks!')
+
     let pp = await conn.profilePictureUrl(m.sender, 'image').catch(_ => 'https://telegra.ph/file/a2ae6cbfa40f6eeea0cf1.jpg')
 
    const obj = {

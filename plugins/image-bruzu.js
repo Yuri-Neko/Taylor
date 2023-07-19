@@ -1,17 +1,24 @@
+import cheerio from 'cheerio';
+import fetch from 'node-fetch';
 
 let handler = async (m, {
     conn,
     isOwner,
     usedPrefix,
     command,
-    text
+    args
 }) => {
-let [watermark, quotes] = text.split(/[^\w\s]/g)
-if (!(watermark && quotes)) return await m.reply("*Example:*\n" + usedPrefix + command + " wm.quotes")
+    let text
+    if (args.length >= 1) {
+        text = args.slice(0).join(" ")
+    } else if (m.quoted && m.quoted.text) {
+        text = m.quoted.text
+    } else throw "Input teks atau reply teks yang ingin di jadikan quote!"
+    await m.reply(wait)
     try {
-        await m.reply(wait)
-        let bruzu = "https://img.bruzu.com/?backgroundImage=" + logo + "&a.text=" + quotes + "&a.color=white&a.fontFamily=Poppins&a.fontWeight=800&a.width=450&b.text=" + watermark + "&b.width=450&b.top=480&b.originY=bottom&b.color=white&b.fontFamily=Playfair Display&b.fontSize=30"
-        await conn.sendFile(m.chat, bruzu, "", "*[ Quotes Maker ]*", m)
+        let data = await Bruzu(text, m.name)
+        let apiURL = 'https://img.bruzu.com/?' + new URLSearchParams(data).toString();
+        await conn.sendFile(m.chat, apiURL, "", "*[ Quotes Maker ]*", m)
     } catch (e) {
         throw eror
     }
@@ -20,3 +27,58 @@ handler.help = ["bruzu"]
 handler.tags = ["search"]
 handler.command = /^(bruzu)$/i
 export default handler
+
+function getParamsObject(url) {
+    const urlParams = new URLSearchParams(url.split('?')[1]);
+    const paramsObject = {};
+
+    for (const [key, value] of urlParams.entries()) {
+        paramsObject[key] = value;
+    }
+
+    return paramsObject;
+}
+
+function transformData(data, quotes, watermark) {
+  const watermarkText = 'Automate Image production';
+  const transformedData = {};
+
+  for (const key in data) {
+    if (data.hasOwnProperty(key)) {
+      let newValue = data[key];
+
+      if (/^[a-z]\.(t|text)$/.test(key)) {
+        if (newValue.length < watermarkText.length) {
+          newValue = watermark;
+        } else {
+          newValue = quotes;
+        }
+      }
+
+      transformedData[key] = newValue;
+    }
+  }
+
+  return transformedData;
+}
+
+async function Bruzu(quotes, watermark) {
+    const url = 'https://bruzu.com/templates/';
+    const response = await fetch(url);
+    const html = await response.text();
+    const links = [];
+    const $ = cheerio.load(html);
+
+    // Use the specified div class to target the links
+    $('div.masonry a').each((index, element) => {
+        const link = $(element).attr('href');
+        if (link) {
+            links.push(link);
+        }
+    });
+    const decodedLinks = links.map(link => decodeURIComponent(link));
+    const src = decodedLinks.map(link => getParamsObject(link));
+    const json = src[Math.floor(Math.random() * src.length)]
+    const transformedData = transformData(json, quotes, watermark);
+    return transformedData;
+}
