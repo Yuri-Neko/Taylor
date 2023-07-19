@@ -130,50 +130,86 @@ let handler = async (m, {
     let old = performance.now()
     let neww = performance.now()
     let speed = neww - old
-    let str = `- *ᴘ ɪ ɴ ɢ* -
-${Math.round(neww - old)}ms
+    const boxTop = "╭─────────────────────╮";
+const boxBottom = "╰─────────────────────╯";
+const boxMiddle = "│";
+
+const divider = "─────────────────────";
+const lineDivider = "─────────────────────";
+
+const uptimeMessage = `${boxMiddle} *Ping* -`;
+const runtimeMessage = `${boxMiddle} *Run Time* -`;
+const chatsMessage = `${boxMiddle} *Chats* -`;
+const serverMessage = `${boxMiddle} *Server* -`;
+const otherMessage = `${boxMiddle} *Other* -`;
+const nodeJsMemoryUsage = `${boxMiddle} NodeJS Memory Usage`;
+
+const str = `
+${boxTop}
+${uptimeMessage}
+${lineDivider}
+${Math.round(newPingTime - oldPingTime)}ms
 ${speed}ms
 
-- *ʀ ᴜ ɴ ᴛ ɪ ᴍ ᴇ* -
-${muptime}
+${boxMiddle} *Run Time* -
+${lineDivider}
+${machineUptime}
 ${readMore}
-- *ᴄ ʜ ᴀ ᴛ s* -
-• *${groupsIn.length}* Group Chats
-• *${groupsIn.length}* Groups Joined
-• *${groupsIn.length - groupsIn.length}* Groups Left
-• *${chats.length - groupsIn.length}* Personal Chats
-• *${chats.length}* Total Chats
 
-- *s ᴇ ʀ ᴠ ᴇ ʀ* -
-*🛑 Rᴀᴍ:* ${ramUsed} / ${_ramTotal}(${/[0-9.+/]/g.test(ramUsed) &&  /[0-9.+/]/g.test(ramTotal) ? Math.round(100 * (ramUsed / ramTotal)) + '%' : NotDetect})
-*🔵 FʀᴇᴇRᴀᴍ:* ${format(freemem())}
+${boxMiddle} *Chats* -
+${lineDivider}
+• *${totalGroups}* Group Chats
+• *${groupsJoined}* Groups Joined
+• *${groupsLeft}* Groups Left
+• *${personalChats}* Personal Chats
+• *${totalChats}* Total Chats
 
-*🔭 ᴘʟᴀᴛғᴏʀᴍ:* ${os.platform()}
-*🧿 sᴇʀᴠᴇʀ:* ${os.hostname()}
-*💻 ᴏs:* ${OS}
-*📍 ɪᴘ:* ${ip}
-*🌎 ᴄᴏᴜɴᴛʀʏ:* ${cr}
-*💬 ᴄᴏᴜɴᴛʀʏ ᴄᴏᴅᴇ:* ${cc}
-*📡 ᴄᴘᴜ ᴍᴏᴅᴇʟ:* ${cpuModel}
-*🔮 ᴄᴘᴜ ᴄᴏʀᴇ:* ${cpuCore} Core
-*🎛️ ᴄᴘᴜ:* ${cpuPer}%
-*⏰ ᴛɪᴍᴇ sᴇʀᴠᴇʀ:* ${times}
+${boxMiddle} *Server* -
+${lineDivider}
+*🛑 RAM:* ${usedRam} / ${totalRam} (${ramUsagePercentage})
+*🔵 Free RAM:* ${format(freeRam)}
+*🔭 Platform:* ${platform}
+*🧿 Server:* ${serverHostname}
+*💻 OS:* ${operatingSystem}
+*📍 IP:* ${ipAddress}
+*🌎 Country:* ${country}
+*💬 Country Code:* ${countryCode}
+*📡 CPU Model:* ${cpuModel}
+*🔮 CPU Core:* ${cpuCore} Core
+*🎛️ CPU:* ${cpuUsagePercentage}%
+*⏰ Server Time:* ${serverTime}
 
-- *ᴏ ᴛ ʜ ᴇ ʀ* -
-*📅 Wᴇᴇᴋꜱ:* ${weeks}
-*📆 Dᴀᴛᴇꜱ:* ${dates}
-*🔁 NᴇᴛꜱIɴ:* ${netsIn}
-*🔁 NᴇᴛꜱOᴜᴛ:* ${netsOut}
-*💿 DʀɪᴠᴇTᴏᴛᴀʟ:* ${driveTotal}
-*💿 DʀɪᴠᴇUꜱᴇᴅ:* ${driveUsed}
-*⚙️ DʀɪᴠᴇPᴇʀ:* ${drivePer}
+${boxMiddle} *Other* -
+${lineDivider}
+*📅 Weeks:* ${weeks}
+*📆 Dates:* ${dates}
+*🔁 Network In:* ${networkIn}
+*🔁 Network Out:* ${networkOut}
+*💿 Drive Total:* ${totalDrive}
+*💿 Drive Used:* ${usedDrive}
+*⚙️ Drive Usage:* ${driveUsagePercentage}
+${boxBottom}
 
 ${readMore}
-*${htjava} ɴᴏᴅᴇJS ᴍᴇᴍᴏʀʏ ᴜsᴀɢᴇ*
-${'```' + Object.keys(used).map((key, _, arr) => `${key.padEnd(Math.max(...arr.map(v => v.length)), ' ')}: ${format(used[key])}`).join('\n') + '```'
-}
-`
-await conn.sendMessage(m.chat, { text: str, mentions: [m.sender] }, { quoted: m })
+
+${boxTop}
+${nodeJsMemoryUsage}
+${lineDivider}
+${'```' + Object.keys(memoryUsed).map((key, _, arr) => `${key.padEnd(Math.max(...arr.map(v => v.length)), ' ')}: ${format(memoryUsed[key])}`).join('\n') + '```'}
+${boxBottom}`;
+
+let pesan = {
+    text: wait,
+    mentions: [m.sender],
+    contextInfo: {
+      forwardingScore: 256,
+      isForwarded: true
+    }
+  };
+
+  let { key } = await conn.sendMessage(m.chat, pesan, { quoted: m });
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  await conn.sendMessage(m.chat, { text: str, edit: key }, { quoted: m });
 
 }
 handler.help = ['ping', 'speed']
