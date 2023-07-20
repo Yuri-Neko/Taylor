@@ -623,15 +623,31 @@ ${clockStringP(usrs.premiumTime - new Date())}` : ""}
 ${v.rowId}`.trim()
             }).filter(v => v).join("\n\n")
             
-        let { key } = await conn.sendMessage(m.chat, { text: 'Wait...' }, { quoted: m })
-const array = [20, 40, 60, 80]
-for (let item of array) {
-  await conn.sendMessage(m.chat, { text: `Wait *${item}%*`, edit: key }, { quoted: m })
-  await new Promise(resolve => setTimeout(resolve, 2000)) // Delay 2 seconds
-}
-
-return conn.sendMessage(m.chat, { text: tek + "\n\n" + spas + "*[ C O M M A N D ]*\n" + sects, edit: key, mentions: [m.sender] }, { quoted: m })
+        
         // Biasa
+        let caption = tek + "\n\n" + spas + "*[ C O M M A N D ]*\n" + sects
+        let pesan = {
+            text: wait,
+            mentions: conn.parseMention(caption),
+            contextInfo: {
+                forwardingScore: 256,
+                isForwarded: true
+            }
+        };
+
+        let {
+            key
+        } = await conn.sendMessage(m.chat, pesan, {
+            quoted: m
+        });
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        return await conn.sendMessage(m.chat, {
+            text: caption,
+            edit: key,
+            mentions: conn.parseMention(caption)
+        }, {
+            quoted: m
+        });
         }
 
         /* Info Total */
@@ -786,14 +802,29 @@ return conn.sendMessage(m.chat, { text: tek + "\n\n" + spas + "*[ C O M M A N D 
         await conn.sendMessage(m.chat, { audio: { url: vn }, seconds: fsizedoc, ptt: true, mimetype: "audio/mpeg", fileName: "vn.mp3", waveform: [100,0,100,0,100,0,100] }, { quoted: m })
         */
         // Biasa
-        let { key } = await conn.sendMessage(m.chat, { text: 'Wait...' }, { quoted: m })
-const array = [20, 40, 60, 80]
-for (let item of array) {
-  await conn.sendMessage(m.chat, { text: `Wait *${item}%*`, edit: key }, { quoted: m })
-  await new Promise(resolve => setTimeout(resolve, 2000)) // Delay 2 seconds
-}
-await conn.sendMessage(m.chat, { text: text.trim(), edit: key, mentions: [m.sender] }, { quoted: m })
+        let caption = text.trim()
+        let pesan = {
+            text: wait,
+            mentions: conn.parseMention(caption),
+            contextInfo: {
+                forwardingScore: 256,
+                isForwarded: true
+            }
+        };
 
+        let {
+            key
+        } = await conn.sendMessage(m.chat, pesan, {
+            quoted: m
+        });
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await conn.sendMessage(m.chat, {
+            text: caption,
+            edit: key,
+            mentions: conn.parseMention(caption)
+        }, {
+            quoted: m
+        });
         // Biasa
         
     } catch (e) {

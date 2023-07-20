@@ -380,7 +380,11 @@ let handler = async (m, {
         */
         
         // Biasa
-        await conn.sendMessage(m.chat, { text: text.trim(), mentions: [m.sender] }, { quoted: m })
+        await conn.sendMessage(m.chat, { text: text.trim(), contextInfo: {
+      mentionedJid: [m.sender],
+                    forwardingScore: 256,
+                    isForwarded: true,
+    }}, { quoted: m })
         // Biasa
     } catch (e) {
         await conn.reply(m.chat, "Maaf, menu sedang error", m)

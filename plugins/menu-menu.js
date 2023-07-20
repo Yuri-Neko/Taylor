@@ -117,17 +117,18 @@ let handler = async (m, {
                 jpegThumbnail: mthumb,
                 contextInfo: {
                     mentionedJid: [m.sender],
+                    forwardingScore: 256,
+                    isForwarded: true,
                     externalAdReply: {
                         body: author,
                         containsAutoReply: true,
                         mediaType: 1,
-                        mediaUrl: sgh,
+                        mediaUrl: sgc,
                         renderLargerThumbnail: true,
-                        showAdAttribution: true,
                         sourceId: "WudySoft",
                         sourceType: "PDF",
                         previewType: "PDF",
-                        sourceUrl: sgh,
+                        sourceUrl: sgc,
                         thumbnail: mthumb,
                         thumbnailUrl: logo,
                         title: htki + " M E N U - B O T " + htka

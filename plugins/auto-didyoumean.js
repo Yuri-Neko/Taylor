@@ -15,7 +15,30 @@ export async function before(m, {
         let name = await this.getName(who)
         let caption = `👋 Hai ${name.split('\n')[0]}\n( @${who.split("@")[0].split('\n')[0]} )\n\nApakah yang kamu maksud:\n*${usedPrefix + mean}*\n\nSimilarity:\n*${Number(sim * 100).toFixed(2)}%*`
         /* Button Section */
-        if (mean) this.sendMessage(m.chat, { text: caption, mentions: this.parseMention(caption) }, { quoted: m })
+        if (mean) {
+        let pesan = {
+            text: "Hmm...",
+            mentions: this.parseMention(caption),
+            contextInfo: {
+                forwardingScore: 256,
+                isForwarded: true
+            }
+        };
+
+        let {
+            key
+        } = await this.sendMessage(m.chat, pesan, {
+            quoted: m
+        });
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await this.sendMessage(m.chat, {
+            text: caption,
+            edit: key,
+            mentions: this.parseMention(caption)
+        }, {
+            quoted: m
+        });
+        }
     }
 }
 export const disabled = false

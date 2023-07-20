@@ -10,7 +10,7 @@ let handler = async (m, {
     text,
     args
 }) => {
-let [modes, kodes] = text.split(/[xzXZ/i!#\$%\+£¢€¥\^°=¶∆×÷π√✓|©®:;\?&\.\\\-]+/)
+let [modes, kodes] = text.split(/[^\w\s]/g)
     if (!modes || !kodes) return m.reply("*Example:*\n.emojikitchen 😅.😅")
             await m.reply(wait)
             try {
