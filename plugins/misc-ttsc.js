@@ -20,7 +20,7 @@ let handler = async (m, {
     let lister = ListVoice.models
     let readMore = String.fromCharCode(8206).repeat(4001);
 
-    let query = "Input text\nEx. .ttsc 3|Hello world!\nVoice list:\n" + readMore + lister.map((item, index) => "  " + (index + 1) + ". " + item.title).join("\n");
+    let query = `Input query!\n\n*Example:*\n${usedPrefix + command} [angka]|[teks]\n\n*Pilih angka yg ada*\n` + readMore + lister.map((item, index) => "  " + (index + 1) + ". " + item.title).join("\n");
     let text
     if (args.length >= 1) {
         text = args.slice(0).join(" ")

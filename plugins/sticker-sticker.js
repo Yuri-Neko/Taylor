@@ -36,7 +36,10 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
                         pack: packnames || packname,
                         keepScale: true
                     })
-                } else if (/extendedTextMessage/g.test(mime)) {
+                } else if (/viewOnceMessageV2/g.test(mime)) {
+			let img = await q.download?.()
+			stiker = await sticker(img, false, packnames || packname, authors || m.name)
+		} else if (/extendedTextMessage/g.test(mime)) {
         	if (!getEmojiFromQuotedText(q.text)) return m.reply("Pesan ini tidak mengandung emoji untuk dijadikan sticker!")
                 let cari = await searchEmoji(getEmojiFromQuotedText(q.text))
                 let emj = getUrlByName(cari, "whatsapp")
