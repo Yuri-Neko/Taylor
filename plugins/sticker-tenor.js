@@ -8,31 +8,29 @@ let handler = async (m, {
     args
 }) => {
     let [tema, urutan] = text.split(/[^\w\s]/g)
-    if (!tema) return m.reply("Input query!\n*Example:*\n.giphy [tema]|[angka]")
-    if (!urutan) return m.reply("Input angka!\n*Example:*\n.giphy [tema]|[angka]")
-    if (isNaN(urutan)) return m.reply("Input angka saja!\n*Example:*\n.giphy [tema]|[angka]")
+    if (!tema) return m.reply("Input query!\n*Example:*\n.tenor [tema]|[angka]")
+    if (!urutan) return m.reply("Input angka!\n*Example:*\n.tenor [tema]|[angka]")
+    if (isNaN(urutan)) return m.reply("Input angka saja!\n*Example:*\n.tenor [tema]|[angka]")
     await m.reply(wait)
     try {
         let json = await getTemplateImageUrl(tema, urutan)
         let data = json.one
         let all = json.all
-        if (urutan > all.length) return m.reply("Input query!\n*Example:*\n.giphy [tema]|[angka]\n\n*Pilih angka yg ada*\n" + all.map((item, index) => `*${index + 1}.* ${item.title}`).join("\n"))
-        if (isValidURL(data.images.original.mp4)) {
+        if (urutan > all.length) return m.reply("Input query!\n*Example:*\n.tenor [tema]|[angka]\n\n*Pilih angka yg ada*\n" + all.map((item, index) => `*${index + 1}.* ${item.content_description}`).join("\n"))
+        if (isValidURL(data.media[0].mp4.url)) {
             let caption = `🔍 *[ HASIL ]*
 
-📌 *Tipe:* ${data.type}
 🆔 *ID:* ${data.id}
 🌐 *URL:* ${data.url}
-🔗 *Bitly URL:* ${data.bitly_url}
-👤 *Username:* ${data.username}
-📰 *Judul:* ${data.title}`
+📋 *Description:* ${data.content_description}
+📌 *Item:* ${data.itemurl}`
             await conn.sendMessage(m.chat, {
                 video: {
-                    url: data.images.original.mp4
+                    url: data.media[0].mp4.url
                 },
                 caption: caption,
                 gifPlayback: true,
-                gifAttribution: 1
+                gifAttribution: 2
             }, {
                 quoted: m
             })
@@ -41,9 +39,9 @@ let handler = async (m, {
         await m.reply(eror)
     }
 }
-handler.help = ["giphy *[tema]|[angka]*"]
+handler.help = ["tenor *[tema]|[angka]*"]
 handler.tags = ["sticker"]
-handler.command = /^(giphy)$/i
+handler.command = /^(tenor)$/i
 export default handler
 
 function isValidURL(message) {
@@ -53,11 +51,11 @@ function isValidURL(message) {
 
 async function getTemplateImageUrl(input, number) {
     try {
-        const data = await (await fetch(`https://api.giphy.com/v1/gifs/search?q=${input}&api_key=SdX60eTdyvdo0aAyJMQ5u87Qh7mTz7bG`)).json();
-        const selectedId = data.data[number - 1];
+        const data = await (await fetch(`https://g.tenor.com/v1/search?q=${input}&key=LIVDSRZULELA`)).json();
+        const selectedId = data.results[number - 1];
         return {
             one: selectedId,
-            all: data.data
+            all: data.results
         };
     } catch (error) {
         console.error("Error fetching data:", error);
