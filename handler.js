@@ -1448,8 +1448,16 @@ export async function groupsUpdate(groupsUpdate) {
 /**
 Polling Chat
  */
-export async function pollUpdate(message) {
-        for(const { key, update } of message) {
+export async function pollingUpdate(message) {
+const {
+            fromMe,
+            id,
+            participant
+        } = message
+        if (fromMe)
+            return
+        let msg = this.serializeM(this.loadMessage(id))
+        for(const { key, update } of msg) {
 			if(update.pollUpdates && key.fromMe) {
 				const pollCreation = this.serializeM(this.loadMessage(key.id))
 				if(pollCreation) {
