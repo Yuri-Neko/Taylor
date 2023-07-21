@@ -22,6 +22,7 @@ import {
     Welcome,
     Leave
 } from "./lib/welcome.js"
+import { getAggregateVotesInPollMessage } from "@adiwajshing/baileys"
 /**
  * @type {import("@adiwajshing/baileys")}
  */
@@ -1441,6 +1442,26 @@ export async function groupsUpdate(groupsUpdate) {
     }
 }
 
+/**
+Polling Chat
+ */
+export async function chatUpdate(chatUpdate) {
+        for(const { key, update } of chatUpdate) {
+			if(update.pollUpdates && key.fromMe) {
+				const pollCreation = this.serializeM(this.loadMessage(key.remoteJid, key.id))
+				if(pollCreation) {
+				    const pollUpdate = await getAggregateVotesInPollMessage({
+							message: pollCreation,
+							pollUpdates: update.pollUpdates,
+						})
+	                var toCmd = pollUpdate.filter(v => v.voters.length !== 0)[0]?.name
+	                if (toCmd == undefined) return
+                    var prefCmd = prefix+toCmd
+	                this.appenTextMessage(prefCmd, chatUpdate)
+				}
+			}
+		}
+		}
 /**
 Delete Chat
  */
