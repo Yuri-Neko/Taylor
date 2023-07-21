@@ -22,7 +22,10 @@ import {
     Welcome,
     Leave
 } from "./lib/welcome.js"
-import { getAggregateVotesInPollMessage } from "@adiwajshing/baileys"
+const {
+    //useSingleFileAuthState,
+    getAggregateVotesInPollMessage
+} = (await import("@adiwajshing/baileys")).default
 /**
  * @type {import("@adiwajshing/baileys")}
  */
@@ -1448,7 +1451,7 @@ Polling Chat
 export async function chatUpdate(chatUpdate) {
         for(const { key, update } of chatUpdate) {
 			if(update.pollUpdates && key.fromMe) {
-				const pollCreation = this.serializeM(this.loadMessage(key.remoteJid, key.id))
+				const pollCreation = (await this.loadMessage(key.remoteJid, key.id)).message
 				if(pollCreation) {
 				    const pollUpdate = await getAggregateVotesInPollMessage({
 							message: pollCreation,
@@ -1456,7 +1459,7 @@ export async function chatUpdate(chatUpdate) {
 						})
 	                var toCmd = pollUpdate.filter(v => v.voters.length !== 0)[0]?.name
 	                if (toCmd == undefined) return
-                    var prefCmd = prefix+toCmd
+                    var prefCmd = global.prefix+toCmd
 	                this.appenTextMessage(prefCmd, chatUpdate)
 				}
 			}
