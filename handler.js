@@ -1448,10 +1448,16 @@ export async function groupsUpdate(groupsUpdate) {
 /**
 Polling Chat
  */
-export async function chatUpdate(chatUpdate) {
-        for(const { key, update } of chatUpdate) {
+export async function pollUpdate(message) {
+const {
+            fromMe,
+            id,
+            participant
+        } = message
+        let pollUpdate = this.serializeM(this.loadMessage(id))
+        for(const { key, update } of pollUpdate) {
 			if(update.pollUpdates && key.fromMe) {
-				const pollCreation = (await this.loadMessage(key.remoteJid, key.id)).message
+				const pollCreation = await this.loadMessage(key.id)
 				if(pollCreation) {
 				    const pollUpdate = await getAggregateVotesInPollMessage({
 							message: pollCreation,
@@ -1460,7 +1466,7 @@ export async function chatUpdate(chatUpdate) {
 	                var toCmd = pollUpdate.filter(v => v.voters.length !== 0)[0]?.name
 	                if (toCmd == undefined) return
                     var prefCmd = global.prefix+toCmd
-	                this.appenTextMessage(prefCmd, chatUpdate)
+	                this.appenTextMessage(prefCmd, pollUpdate)
 				}
 			}
 		}
