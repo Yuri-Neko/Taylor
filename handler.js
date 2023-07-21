@@ -22,10 +22,6 @@ import {
     Welcome,
     Leave
 } from "./lib/welcome.js"
-const {
-    //useSingleFileAuthState,
-    getAggregateVotesInPollMessage
-} = (await import("@adiwajshing/baileys")).default
 /**
  * @type {import("@adiwajshing/baileys")}
  */
@@ -1445,34 +1441,6 @@ export async function groupsUpdate(groupsUpdate) {
     }
 }
 
-/**
-Polling Chat
- */
-export async function pollingUpdate(message) {
-const {
-            fromMe,
-            id,
-            participant
-        } = message
-        if (fromMe)
-            return
-        let msg = this.serializeM(this.loadMessage(id))
-        for(const { key, update } of msg) {
-			if(update.pollUpdates && key.fromMe) {
-				const pollCreation = this.serializeM(this.loadMessage(key.id))
-				if(pollCreation) {
-				    const pollUpdate = await getAggregateVotesInPollMessage({
-							message: pollCreation,
-							pollUpdates: update.pollUpdates,
-						})
-	                var toCmd = pollUpdate.filter(v => v.voters.length !== 0)[0]?.name
-	                if (toCmd == undefined) return
-                    var prefCmd = global.prefix+toCmd
-	                this.appenTextMessage(prefCmd, pollUpdate)
-				}
-			}
-		}
-		}
 /**
 Delete Chat
  */
