@@ -1182,29 +1182,29 @@ export async function handler(chatUpdate) {
                 let xp = "exp" in plugin ? parseInt(plugin.exp) : 17 // XP Earning per command
                 if (xp > 200)
                     this.sendMessage(m.chat, {
-                text: `[❗] *Sepertinya Anda Bermain Curang, Menggunakan Calculator*`,
-                mentions: [m.sender]
-            }, {
-                quoted: m
-            })
+                        text: `[❗] *Sepertinya Anda Bermain Curang, Menggunakan Calculator*`,
+                        mentions: [m.sender]
+                    }, {
+                        quoted: m
+                    })
                 else
                     m.exp += xp
                 if (!isPrems && plugin.limit && global.db.data.users[m.sender].limit < plugin.limit * 1) {
                     this.sendMessage(m.chat, {
-                text: `[❗] *Limit Anda Habis, Beberapa Command Tidak Bisa Di Akses*`,
-                mentions: [m.sender]
-            }, {
-                quoted: m
-            })
+                        text: `[❗] *Limit Anda Habis, Beberapa Command Tidak Bisa Di Akses*`,
+                        mentions: [m.sender]
+                    }, {
+                        quoted: m
+                    })
                     continue // Limit habis
                 }
                 if (plugin.level > _user.level) {
                     this.sendMessage(m.chat, {
-                text: `[💬] Diperlukan level *${plugin.level}* untuk menggunakan perintah ini. Level kamu *${_user.level}🎋*\n*${plugin.level}* level is required to use this command. Your level is *${_user.level}🎋*`,
-                mentions: [m.sender]
-            }, {
-                quoted: m
-            })
+                        text: `[💬] Diperlukan level *${plugin.level}* untuk menggunakan perintah ini. Level kamu *${_user.level}🎋*\n*${plugin.level}* level is required to use this command. Your level is *${_user.level}🎋*`,
+                        mentions: [m.sender]
+                    }, {
+                        quoted: m
+                    })
                     continue // If the level has not been reached
                 }
                 let extra = {
@@ -1338,7 +1338,10 @@ export async function participantsUpdate({
         await loadDatabase()
     let chat = global.db.data.chats[id] || {}
     let text = ""
-
+    const emoji = {
+        promote: '👤👑',
+        demote: '👤🙅‍♂️',
+    }
     switch (action) {
         case "add":
         case "remove":
@@ -1373,7 +1376,7 @@ export async function participantsUpdate({
                             .setMemberCount(user.length)
                             .setAvatar(pp)
                             .setBackground(thumbnailUrl.getRandom())
-                            .toAttachment();
+                            .toAttachment()
                         let wela = welbuf.toBuffer()
                         let welb = await Welcome(pp, thumbnailUrl.getRandom(), names, user.length)
 
@@ -1384,7 +1387,7 @@ export async function participantsUpdate({
                             .setMemberCount(user.length)
                             .setAvatar(pp)
                             .setBackground(thumbnailUrl.getRandom())
-                            .toAttachment();
+                            .toAttachment()
                         let byeea = byeebuf.toBuffer()
                         let byeeb = await Leave(pp, thumbnailUrl.getRandom(), names)
                         let welran = [wela, welb].getRandom()
@@ -1396,16 +1399,19 @@ export async function participantsUpdate({
             }
             break
         case "promote":
-            text = (chat.sPromote || this.spromote || conn.spromote || "@user *is now Admin*")
+            text = (chat.sPromote || this.spromote || conn.spromote || `${emoji.promote} @user *telah diangkat menjadi Admin*`)
+            break
         case "demote":
-            if (!text) text = (chat.sDemote || this.sdemote || conn.sdemote || "@user *is no longer Admin*")
+            text = (chat.sDemote || this.sdemote || conn.sdemote || `${emoji.demote} @user *tidak lagi menjadi Admin*`)
             text = text.replace("@user", "@" + participants[0].split("@")[0])
-            if (chat.detect) this.sendMessage(id, {
-                text: text.trim(),
-                mentions: [participants[0]]
-            }, {
-                quoted: fakes
-            })
+            if (chat.detect) {
+                this.sendMessage(id, {
+                    text: text.trim(),
+                    mentions: [participants[0]],
+                }, {
+                    quoted: fakes,
+                })
+            }
             break
 
     }
@@ -1421,16 +1427,42 @@ export async function groupsUpdate(groupsUpdate) {
         const id = groupUpdate.id
         if (!id) continue
         let chats = global.db.data.chats[id] || {}
+        const emoji = {
+            desc: '📝',
+            subject: '📌',
+            icon: '🖼️',
+            revoke: '🔗',
+            announceOn: '🔒',
+            announceOff: '🔓',
+            restrictOn: '🚫',
+            restrictOff: '✅',
+        }
+
         let text = ""
         if (!chats.detect) continue
-        if (groupUpdate.desc) text = (chats.sDesc || this.sDesc || conn.sDesc || "*Description has been changed to*\n@desc").replace("@desc", groupUpdate.desc)
-        if (groupUpdate.subject) text = (chats.sSubject || this.sSubject || conn.sSubject || "*Subject has been changed to*\n@subject").replace("@subject", groupUpdate.subject)
-        if (groupUpdate.icon) text = (chats.sIcon || this.sIcon || conn.sIcon || "*Icon has been changed to*").replace("@icon", groupUpdate.icon)
-        if (groupUpdate.revoke) text = (chats.sRevoke || this.sRevoke || conn.sRevoke || "*Group link has been changed to*\n@revoke").replace("@revoke", groupUpdate.revoke)
-        if (groupUpdate.announce == true) text = (chats.sAnnounceOn || this.sAnnounceOn || conn.sAnnounceOn || "*Group has been closed!*")
-        if (groupUpdate.announce == false) text = (chats.sAnnounceOff || this.sAnnounceOff || conn.sAnnounceOff || "*Group has been open!*")
-        if (groupUpdate.restrict == true) text = (chats.sRestrictOn || this.sRestrictOn || conn.sRestrictOn || "*Group has been all participants!*")
-        if (groupUpdate.restrict == false) text = (chats.sRestrictOff || this.sRestrictOff || conn.sRestrictOff || "*Group has been only admin!*")
+
+        if (groupUpdate.desc) {
+            text = (chats.sDesc || this.sDesc || conn.sDesc || `*${emoji.desc} Deskripsi telah diubah menjadi*\n@desc`)
+                .replace("@desc", groupUpdate.desc)
+        } else if (groupUpdate.subject) {
+            text = (chats.sSubject || this.sSubject || conn.sSubject || `*${emoji.subject} Subjek telah diubah menjadi*\n@subject`)
+                .replace("@subject", groupUpdate.subject)
+        } else if (groupUpdate.icon) {
+            text = (chats.sIcon || this.sIcon || conn.sIcon || `*${emoji.icon} Icon telah diubah menjadi*`)
+                .replace("@icon", groupUpdate.icon)
+        } else if (groupUpdate.revoke) {
+            text = (chats.sRevoke || this.sRevoke || conn.sRevoke || `*${emoji.revoke} Tautan grup telah diubah menjadi*\n@revoke`)
+                .replace("@revoke", groupUpdate.revoke)
+        } else if (groupUpdate.announce === true) {
+            text = (chats.sAnnounceOn || this.sAnnounceOn || conn.sAnnounceOn || `*${emoji.announceOn} Grup telah ditutup!*`)
+        } else if (groupUpdate.announce === false) {
+            text = (chats.sAnnounceOff || this.sAnnounceOff || conn.sAnnounceOff || `*${emoji.announceOff} Grup telah dibuka!*`)
+        } else if (groupUpdate.restrict === true) {
+            text = (chats.sRestrictOn || this.sRestrictOn || conn.sRestrictOn || `*${emoji.restrictOn} Grup telah dibatasi hanya untuk peserta!*`)
+        } else if (groupUpdate.restrict === false) {
+            text = (chats.sRestrictOff || this.sRestrictOff || conn.sRestrictOff || `*${emoji.restrictOff} Grup telah dibatasi hanya untuk admin!*`)
+        }
+
         if (!text) continue
         this.sendMessage(id, {
             text: text.trim(),
@@ -1475,40 +1507,53 @@ export async function deleteUpdate(message) {
 dfail
  */
 global.dfail = (type, m, conn) => {
-    let nmsr = `👋 Hai *@${m.sender.split("@")[0]}*, `
-    let msg = {
-        rowner: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} Perintah ini hanya dapat digunakan oleh *OWWNER* !`,
-        owner: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} Perintah ini hanya dapat digunakan oleh *Owner Bot* !`,
-        mods: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} Perintah ini hanya dapat digunakan oleh *Moderator* !`,
-        premium: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} Perintah ini hanya untuk member *Premium* !`,
-        group: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} Perintah ini hanya dapat digunakan di grup !`,
-        private: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} Perintah ini hanya dapat digunakan di Chat Pribadi !`,
-        admin: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} Perintah ini hanya untuk *Admin* grup !`,
-        botAdmin: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} Jadikan bot sebagai *Admin* untuk menggunakan perintah ini !`,
-        unreg: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} Silahkan daftar untuk menggunakan fitur ini dengan cara mengetik:\n\n*#daftar nama.umur*\n\nContoh: *#daftar ${m.name}.18* !`,
-        nsfw: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} NSFW tidak aktif, Silahkan hubungi Team Bot Discussion untuk mengaktifkan fitur ini !`,
-        rpg: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} RPG tidak aktif, Silahkan hubungi Team Bot Discussion Untuk mengaktifkan fitur ini !`,
-        restrict: `*${htki} ᴘᴇʀʜᴀᴛɪᴀɴ ${htka}*\n
-${nmsr} Fitur ini di *disable* !`
+    const userTag = `👋 Hai *@${m.sender.split("@")[0]}*, `
+    const emoji = {
+        general: '⚙️',
+        owner: '👑',
+        moderator: '🛡️',
+        premium: '💎',
+        group: '👥',
+        private: '📱',
+        admin: '👤',
+        botAdmin: '🤖',
+        unreg: '🔒',
+        nsfw: '🔞',
+        rpg: '🎮',
+        restrict: '⛔',
+    }
+
+    const msg = {
+        owner: `*${emoji.owner} ᴘᴇʀʜᴀᴛɪᴀɴ ᴏᴡɴᴇʀ*\n
+${userTag} Perintah ini hanya dapat digunakan oleh *Owner Bot* !`,
+        moderator: `*${emoji.moderator} ᴘᴇʀʜᴀᴛɪᴀɴ ᴍᴏᴅᴇʀᴀᴛᴏʀ*\n
+${userTag} Perintah ini hanya dapat digunakan oleh *Moderator* !`,
+        premium: `*${emoji.premium} ᴘᴇʀʜᴀᴛɪᴀɴ ᴘʀᴇᴍɪᴜᴍ*\n
+${userTag} Perintah ini hanya untuk member *Premium* !`,
+        group: `*${emoji.group} ᴘᴇʀʜᴀᴛɪᴀɴ ɢʀᴜᴘ*\n
+${userTag} Perintah ini hanya dapat digunakan di grup !`,
+        private: `*${emoji.private} ᴘᴇʀʜᴀᴛɪᴀɴ ᴘʀɪᴠᴀᴛᴇ*\n
+${userTag} Perintah ini hanya dapat digunakan di Chat Pribadi !`,
+        admin: `*${emoji.admin} ᴘᴇʀʜᴀᴛɪᴀɴ ᴀᴅᴍɪɴ*\n
+${userTag} Perintah ini hanya untuk *Admin* grup !`,
+        botAdmin: `*${emoji.botAdmin} ᴘᴇʀʜᴀᴛɪᴀɴ ʙᴏᴛ ᴀᴅᴍɪɴ*\n
+${userTag} Jadikan bot sebagai *Admin* untuk menggunakan perintah ini !`,
+        unreg: `*${emoji.unreg} ᴘᴇʀʜᴀᴛɪᴀɴ ᴅᴀꜰᴛᴀʀ*\n
+${userTag} Silahkan daftar untuk menggunakan fitur ini dengan cara mengetik:\n\n*#daftar nama.umur*\n\nContoh: *#daftar ${m.name}.18* !`,
+        nsfw: `*${emoji.nsfw} ᴘᴇʀʜᴀᴛɪᴀɴ ɴꜱꜰᴡ*\n
+${userTag} NSFW tidak aktif, Silahkan hubungi Team Bot Discussion untuk mengaktifkan fitur ini !`,
+        rpg: `*${emoji.rpg} ᴘᴇʀʜᴀᴛɪᴀɴ ʀᴘɢ*\n
+${userTag} RPG tidak aktif, Silahkan hubungi Team Bot Discussion Untuk mengaktifkan fitur ini !`,
+        restrict: `*${emoji.restrict} ᴘᴇʀʜᴀᴛɪᴀɴ ᴛɪᴅᴀᴋ ᴀᴋᴛɪꜰ*\n
+${userTag} Fitur ini di *disable* !`,
     } [type]
     if (msg) return conn.sendMessage(m.chat, {
-                text: msg,
-                mentions: conn.parseMention(msg)
-            }, {
-                quoted: m
-            })
-    
+        text: msg,
+        mentions: conn.parseMention(msg)
+    }, {
+        quoted: m
+    })
+
 }
 
 let file = global.__filename(import.meta.url, true)

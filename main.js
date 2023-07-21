@@ -217,18 +217,33 @@ global.reloadHandler = async function(restatConn) {
         conn.ev.off('creds.update', conn.credsUpdate)
     }
 
-    conn.welcome = '👋 Hallo @user\n\n                *W E L C O M E*\n⫹⫺ In @subject\n\n⫹⫺ Read *DESCRIPTION*\n@desc'
-    conn.bye = '👋 Byee @user\n\n                *G O O D B Y E*'
-    conn.spromote = '*@user* Sekarang jadi admin!'
-    conn.sdemote = '*@user* Sekarang bukan lagi admin!'
-    conn.sDesc = 'Deskripsi telah diubah menjadi \n@desc'
-    conn.sSubject = 'Judul grup telah diubah menjadi \n@subject'
-    conn.sIcon = 'Icon grup telah diubah!'
-    conn.sRevoke = 'Link group telah diubah ke \n@revoke'
-    conn.sAnnounceOn = 'Group telah di tutup!\nsekarang hanya admin yang dapat mengirim pesan.'
-    conn.sAnnounceOff = 'Group telah di buka!\nsekarang semua peserta dapat mengirim pesan.'
-    conn.sRestrictOn = 'Edit Info Grup di ubah ke hanya admin!'
-    conn.sRestrictOff = 'Edit Info Grup di ubah ke semua peserta!'
+    const emoji = {
+        welcome: '👋',
+        bye: '👋',
+        promote: '👤👑',
+        demote: '👤🙅‍♂️',
+        desc: '📝',
+        subject: '📌',
+        icon: '🖼️',
+        revoke: '🔗',
+        announceOn: '🔒',
+        announceOff: '🔓',
+        restrictOn: '🚫',
+        restrictOff: '✅',
+    };
+
+    conn.welcome = `${emoji.welcome} Hallo @user\n\n*W E L C O M E*\n⫹⫺ Di grup @subject\n\n⫹⫺ Baca *DESKRIPSI*\n@desc`;
+    conn.bye = `${emoji.bye} Sampai jumpa @user\n\n*G O O D B Y E*`;
+    conn.spromote = `*${emoji.promote} @user* sekarang menjadi admin!`;
+    conn.sdemote = `*${emoji.demote} @user* tidak lagi menjadi admin!`;
+    conn.sDesc = `${emoji.desc} Deskripsi telah diubah menjadi:\n@desc`;
+    conn.sSubject = `${emoji.subject} Judul grup telah diubah menjadi:\n@subject`;
+    conn.sIcon = `${emoji.icon} Icon grup telah diubah!`;
+    conn.sRevoke = `${emoji.revoke} Link grup telah diubah ke:\n@revoke`;
+    conn.sAnnounceOn = `${emoji.announceOn} Grup telah ditutup!\nSekarang hanya admin yang dapat mengirim pesan.`;
+    conn.sAnnounceOff = `${emoji.announceOff} Grup telah dibuka!\nSekarang semua peserta dapat mengirim pesan.`;
+    conn.sRestrictOn = `${emoji.restrictOn} Edit Info Grup diubah ke hanya admin!`;
+    conn.sRestrictOff = `${emoji.restrictOff} Edit Info Grup diubah ke semua peserta!`;
 
     conn.handler = handler.handler.bind(global.conn)
     conn.participantsUpdate = handler.participantsUpdate.bind(global.conn)
