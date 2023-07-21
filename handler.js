@@ -1449,15 +1449,9 @@ export async function groupsUpdate(groupsUpdate) {
 Polling Chat
  */
 export async function pollUpdate(message) {
-const {
-            fromMe,
-            id,
-            participant
-        } = message
-        let pollUpdate = this.serializeM(this.loadMessage(id))
-        for(const { key, update } of pollUpdate) {
+        for(const { key, update } of message) {
 			if(update.pollUpdates && key.fromMe) {
-				const pollCreation = await this.loadMessage(key.id)
+				const pollCreation = this.serializeM(this.loadMessage(key.id))
 				if(pollCreation) {
 				    const pollUpdate = await getAggregateVotesInPollMessage({
 							message: pollCreation,
