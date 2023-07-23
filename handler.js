@@ -886,6 +886,7 @@ export async function handler(chatUpdate) {
             if (chat) {
                 if (!("antiDelete" in chat)) chat.antiDelete = true
                 if (!("antiLink" in chat)) chat.antiLink = false
+                if (!("viewStory" in chat)) chat.viewStory = false
                 if (!("antiSticker" in chat)) chat.antiSticker = false
                 if (!("antiToxic" in chat)) chat.antiToxic = true
                 if (!("detect" in chat)) chat.detect = true
@@ -912,6 +913,7 @@ export async function handler(chatUpdate) {
                 global.db.data.chats[m.chat] = {
                     antiDelete: true,
                     antiLink: false,
+                    viewStory: false,
                     antiSticker: false,
                     antiToxic: false,
                     detect: true,
