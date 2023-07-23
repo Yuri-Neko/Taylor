@@ -15,7 +15,8 @@ let handler = async (m, {
     let lister = [
         "v1",
         "v2",
-        "v3"
+        "v3",
+        "v4"
     ]
 
     let [feature, inputs, inputs_, inputs__, inputs___] = text.split(" ")
@@ -157,6 +158,50 @@ if (scrap[0].link) {
     await conn.sendFile(m.chat, scrap[0].link, scrap[0].nama, "", m, null, { mimetype: scrap[0].mime, asDocument: true })
     } else throw eror
         }
+        if (feature == "v4") {
+        	if (!inputs) return m.reply("Input mediafire link")
+                let scrap = await mediafireDl2(inputs)
+    let capscrap = `
+*💌 Name:* ${scrap.nama}
+*📊 Size:* ${scrap.size}
+*🗂️ Extension:* ${scrap.mime}
+
+${wait}
+`
+let thumbnail = 'https://i.pinimg.com/736x/a2/27/d9/a227d943642d43d8992b1bde1f323dd0.jpg'
+let thumed = await (await conn.getFile(thumbnail)).data
+        let msg = await generateWAMessageFromContent(m.chat, {
+            extendedTextMessage: {
+                text: capscrap,
+                jpegThumbnail: thumed,
+                contextInfo: {
+                    mentionedJid: [m.sender],
+                    externalAdReply: {
+                        body: 'D O W N L O A D E R',
+                        containsAutoReply: true,
+                        mediaType: 1,
+                        mediaUrl: inputs,
+                        renderLargerThumbnail: true,
+                        showAdAttribution: true,
+                        sourceId: "WudySoft",
+                        sourceType: "PDF",
+                        previewType: "PDF",
+                        sourceUrl: inputs,
+                        thumbnail: thumed,
+                        thumbnailUrl: thumbnail,
+                        title: 'M E D I A F I R E'
+                    }
+                }
+            }
+        }, {
+            quoted: m
+        })
+        await conn.relayMessage(m.chat, msg.message, {})
+    
+if (scrap.link) {
+    await conn.sendFile(m.chat, scrap.link, scrap.nama, "", m, null, { mimetype: scrap.mime, asDocument: true })
+    } else throw eror
+        }
 
     }
 }
@@ -176,4 +221,40 @@ async function mediafireDl(url) {
     $('a#downloadButton').text().replace(/Download|\(|\)|\n|\s+/g, '').trim()
   ];
   return [{ nama, mime, size, link }];
+}
+
+async function mediafireDl2(url) {
+    var _a, _b;
+    if (!/https?:\/\/(www\.)?mediafire\.com/.test(url))
+        throw new Error('Invalid URL: ' + url);
+    const data = await (await fetch(url)).text();
+    const $ = cheerio.load(data);
+    const Url = ($('#downloadButton').attr('href') || '').trim();
+    const url2 = ($('#download_link > a.retry').attr('href') || '').trim();
+    const $intro = $('div.dl-info > div.intro');
+    const filename = $intro.find('div.filename').text().trim();
+    const filetype = $intro.find('div.filetype > span').eq(0).text().trim();
+    const ext = ((_b = (_a = /\(\.(.*?)\)/.exec($intro.find('div.filetype > span').eq(1).text())) === null || _a === void 0 ? void 0 : _a[1]) === null || _b === void 0 ? void 0 : _b.trim()) || 'bin';
+    const $li = $('div.dl-info > ul.details > li');
+    const aploud = $li.eq(1).find('span').text().trim();
+    const filesizeH = $li.eq(0).find('span').text().trim();
+    const filesize = parseFloat(filesizeH) * (/GB/i.test(filesizeH)
+        ? 1000000
+        : /MB/i.test(filesizeH)
+            ? 1000
+            : /KB/i.test(filesizeH)
+                ? 1
+                : /B/i.test(filesizeH)
+                    ? 0.1
+                    : 0);
+    return {
+        link: Url,
+        url2,
+        nama: filename,
+        filetype,
+        mime: ext,
+        aploud,
+        size: filesizeH,
+        filesize
+    };
 }

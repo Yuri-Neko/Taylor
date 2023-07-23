@@ -8,15 +8,15 @@ if (!text) throw "input Nomor"
   m.reply('Waiting...')
   let o
   try {
-    o = await exec('python3 ./plugins/call.py ' + text)
+    o = await exec('python3 ./plugins/calling.py ' + text)
   } catch (e) {
     o = e
   } finally {
     let { stdout } = o
-    await conn.reply(m.chat, '*Code:* ' + stdout, m)
+    await conn.reply(m.chat, stdout, m)
   }
     }
-handler.help = ['call']
+handler.help = ['calling']
 handler.tags = ['info']
-handler.command = ['call']
+handler.command = ['calling']
 export default handler

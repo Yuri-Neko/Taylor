@@ -25,29 +25,7 @@ keban = true
     m.reply('Bot Udah Bangun bang :>!')
     }
 }
-if (command == 'tikporntok') {
-let puk = await xtikporntok()
-        let lip = 'https://tikporntok.com/'
-        let lic = `*${htki} tikporntok.com ${htka}*
-*title:* ${puk.title}
-*source:* ${puk.source}
-*thumb:* ${lip + puk.thumb}
-*desc:* ${puk.desc}
-*upload:* ${puk.upload}
-*like:* ${puk.like}
-*dislike:* ${puk.dislike}
-*favorite:* ${puk.favorite}
-*views:* ${puk.views}
-*tags:* ${puk.tags}
-*video:* ${lip + puk.video}`
-        
-        try {
-await conn.sendFile(m.chat, lip + puk.video, '', lic, m)
-} catch {
-throw 'Manaa Gk Adaa :>'
-}
 
-}
 
 if (command == 'turnbackhoax') {
 m.reply(wait)
@@ -194,7 +172,7 @@ let tek = await xhentai(text)
 }
 
 }
-handler.command = ['xhentai', 'xstyletext', 'xringtone', 'xumma', 'xquotesnime', 'xwikimedia', 'xwallpaper', 'xpinterest', 'xaiovideodl', 'apakah2', 'turu', 'tikporntok', 'turnbackhoax']
+handler.command = ['xhentai', 'xstyletext', 'xringtone', 'xumma', 'xquotesnime', 'xwikimedia', 'xwallpaper', 'xpinterest', 'xaiovideodl', 'apakah2', 'turu', 'turnbackhoax']
 
 export default handler
 
@@ -357,29 +335,6 @@ async function xstyletext(teks) {
             $('table > tbody > tr').each(function (a, b) {
                 hasil.push({ name: $(b).find('td:nth-child(1) > span').text(), result: $(b).find('td:nth-child(2)').text().trim() })
             })
-            resolve(hasil)
-        })
-    })
-}
-
-async function xtikporntok() {
-    return new Promise((resolve, reject) => {
-        axios.get('https://tikporntok.com/?random=1')
-        .then((res) => {
-            const $ = cheerio.load(res.data)
-            let hasil = {
-            title: $('article > h1').text(),
-            source: $('article > div.video-wrapper.vxplayer').attr('data-post') || 'Web Not Response',
-            thumb: $('article > div.video-wrapper.vxplayer > div.vx_el').attr('data-poster') || 'https://4.bp.blogspot.com/-hyMqjmQQq4o/W6al-Rk4IpI/AAAAAAAADJ4/m-lVBA_GC9Q5d4BIQg8ZO3fYmQQC3LqSACLcBGAs/s1600/404_not_found.png',
-            desc: $('article > div.intro').text(),
-            upload: $('article > div.single-pre-meta.ws.clearfix > time').text(),
-            like: $('article > div.single-pre-meta.ws.clearfix > div > span:nth-child(1) > span').text(),
-            dislike: $('article > div.single-pre-meta.ws.clearfix > div > span:nth-child(2) > span').text(),
-            favorite: $('article > div.single-pre-meta.ws.clearfix > div > span:nth-child(3) > span').text(),
-            views: $('article > div.single-pre-meta.ws.clearfix > div > span:nth-child(4) > span').text(),
-            tags: $('article > div.post-tags').text(),
-            video: $('article > div.video-wrapper.vxplayer > div.vx_el').attr('src') || $('article > div.video-wrapper.vxplayer > div.vx_el').attr('data-src') || 'https://4.bp.blogspot.com/-hyMqjmQQq4o/W6al-Rk4IpI/AAAAAAAADJ4/m-lVBA_GC9Q5d4BIQg8ZO3fYmQQC3LqSACLcBGAs/s1600/404_not_found.png'
-            }
             resolve(hasil)
         })
     })

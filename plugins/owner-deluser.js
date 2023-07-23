@@ -39,7 +39,7 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
 }
 handler.help = ['deleteuser']
 handler.tags = ['owner']
-handler.command = /^(d(el)?(ete)?u(ser)?|ha?pu?su(ser)?)$/i
+handler.command = /^del(ete)?user$/i
 
 handler.rowner = true
 

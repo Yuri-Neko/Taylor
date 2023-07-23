@@ -22,7 +22,7 @@ ${item.map(v => `${rpg.emoticon(v)}${v}`.trim()).join('\n')}
     if (!who) return m.reply('Tag salah satu, atau ketik Nomernya!!')
     if (!(who in global.db.data.users)) return m.reply(`User ${who} not in database`)
     if (user[type] * 1 < count) return m.reply(`Your *${rpg.emoticon(type)}${type}${special(type)}* is less *${count - user[type]}*`)
-                let txt = `Apakah Anda yakin ingin melakukan transfer ✅ (Yes) ❌ (No)\n\n`
+                let txt = `Apakah Anda yakin ingin melakukan transfer\n ✅ (Yes) ❌ (No)\n\n`
     let confirm = `
 *––––––『 TRANSFER 』––––––*
 *🗂️ Type:* ${type} ${rpg.emoticon(type)}${special(type)}
@@ -33,14 +33,16 @@ ${txt}
 ⏰ Timeout *60* detik
 `.trim()
     let c = wm
-    conn.reply(m.chat, confirm, m, { mentions: [who] })
+    let { key } = await conn.reply(m.chat, confirm, m, { mentions: [who] })
     confirmation[m.sender] = {
         sender: m.sender,
         to: who,
         message: m,
         type,
         count,
-        timeout: setTimeout(() => (m.reply('Timeout'), delete confirmation[m.sender]), 60 * 1000)
+        key,
+        pesan: conn,
+        timeout: setTimeout(() => (conn.sendMessage(m.chat, { delete: key }), delete confirmation[m.sender]), 60 * 1000)
     }
 }
 
@@ -48,11 +50,12 @@ handler.before = async m => {
     if (m.isBaileys) return
     if (!(m.sender in confirmation)) return
     if (!m.text) return
-    let { timeout, sender, message, to, type, count } = confirmation[m.sender]
+    let { timeout, sender, message, to, type, count, key, pesan } = confirmation[m.sender]
     if (m.id === message.id) return
     let user = global.db.data.users[sender]
     let _user = global.db.data.users[to]
     if (/(✖️|n(o)?)/g.test(m.text.toLowerCase())) {
+        pesan.sendMessage(m.chat, { delete: key })
         clearTimeout(timeout)
         delete confirmation[sender]
         return m.reply('Reject')
@@ -68,6 +71,8 @@ handler.before = async m => {
             _user[type] = _previous
             m.reply(`*––––––『 TRANSFER 』––––––*\n*📊 Status:* Failted\n*📍 Item:* ${count} ${rpg.emoticon(type)}${type}${special(type)}\n*📨 To:* @${(to || '').replace(/@s\.whatsapp\.net/g, '')}`, null, { mentions: [to] })
         }
+        
+        pesan.sendMessage(m.chat, { delete: key })
         clearTimeout(timeout)
         delete confirmation[sender]
     }
