@@ -1,5 +1,4 @@
-import similarity from 'similarity';
-let susunkalimat = {};
+import similarity from 'similarity'
 
 const sentences = {
   easy: [
@@ -50,81 +49,93 @@ const sentences = {
     "Sungai yang jernih mengalir di tengah hutan tropis yang lebat",
     "Gajah besar berjalan perlahan di padang rumput luas",
   ],
-};
+}
 
-async function handler(m, { conn }) {
-    if (susunkalimat[m.sender]) {
-        return m.reply('Kamu sedang bermain Susun Kalimat!');
+const handler = async (m, {
+    conn
+}) => {
+conn.susunKalimat = conn.susunKalimat ? conn.susunKalimat : {}
+    if (conn.susunKalimat[m.chat]) {
+        return m.reply('Kamu sedang bermain Susun Kalimat!')
     }
 
-    const levels = Object.keys(sentences);
-    const randomLevel = levels[Math.floor(Math.random() * levels.length)];
-    const randomSentences = sentences[randomLevel];
-    const randomIndex = Math.floor(Math.random() * randomSentences.length);
+    const levels = Object.keys(sentences)
+    const randomLevel = levels[Math.floor(Math.random() * levels.length)]
+    const randomSentences = sentences[randomLevel]
+    const randomIndex = Math.floor(Math.random() * randomSentences.length)
 
-    const originalSentence = randomSentences[randomIndex];
-    const shuffledSentence = shuffleSentence(originalSentence);
+    const originalSentence = randomSentences[randomIndex]
+    const shuffledSentence = shuffleSentence(originalSentence)
 
-    m.reply(`🧩 *Level*: ${randomLevel.toUpperCase()}\nSusun kalimat berikut ini menjadi benar:\n\n*${shuffledSentence.toLowerCase()}*\n\nKamu memiliki waktu *60 detik* untuk menjawab.`);
+    let { key } = await conn.reply(m.chat, `🧩 *Level*: ${randomLevel.toUpperCase()}\nSusun kalimat berikut ini menjadi benar:\n\n*${shuffledSentence.toLowerCase()}*\n\nKamu memiliki waktu *60 detik* untuk menjawab.`, m)
 
-    susunkalimat[m.sender] = {
+    conn.susunKalimat[m.chat] = {
         sender: m.sender,
         originalSentence,
         shuffledSentence,
         level: randomLevel,
-        pesan: conn,
+        key: key,
         timeout: setTimeout(() => {
-            if (susunkalimat[m.sender]) {
-                delete susunkalimat[m.sender];
-                m.reply(`⌛ Waktu habis! Kamu gagal menyusun kalimat.\n*${originalSentence.toLowerCase()}*`);
+            if (conn.susunKalimat[m.chat]) {
+            conn.sendMessage(m.chat, {
+                delete: key
+            })
+            m.reply(`⌛ Waktu habis! Kamu gagal menyusun kalimat.\n*${originalSentence.toLowerCase()}*`)
+                delete conn.susunKalimat[m.chat]
             }
         }, 60000 * 2)
-    };
+    }
 }
 
-handler.before = async (m) => {
-    if (m.isBaileys) return;
-    if (!(m.sender in susunkalimat)) return;
-    if (!m.text) return;
+handler.before = async (m, {
+    conn
+}) => {
+conn.susunKalimat = conn.susunKalimat ? conn.susunKalimat : {}
+    if (m.isBaileys) return
+    if (!(m.sender in conn.susunKalimat)) return
+    if (!m.text) return
 
-    const { originalSentence, sender, shuffledSentence, pesan } = susunkalimat[m.sender];
+    const { originalSentence, sender, shuffledSentence, key, timeout } = conn.susunKalimat[m.chat]
 
-    const isAnswerCorrect = m.text.toLowerCase() === originalSentence.toLowerCase();
-    const similarityIndex = jaccardSimilarity(m.text.toLowerCase(), originalSentence.toLowerCase());
-    const similarityThreshold = 0.8;
+    const isAnswerCorrect = m.text.toLowerCase() === originalSentence.toLowerCase()
+    const similarityIndex = jaccardSimilarity(m.text.toLowerCase(), originalSentence.toLowerCase())
+    const similarityThreshold = 0.8
 
     if (isAnswerCorrect) {
-        const level = susunkalimat[m.sender].level;
-        await pesan.reply(m.chat, `✨ *Selamat*, @${m.sender.split('@')[0]}! Kamu berhasil menyusun kalimat dengan benar pada *level ${level.toUpperCase()}*!`, m, { mentions: [m.sender] });
-        clearTimeout(susunkalimat[m.sender].timeout);
-        delete susunkalimat[m.sender];
+        const level = conn.susunKalimat[m.chat].level
+        conn.reply(m.chat, `✨ *Selamat*, @${m.sender.split('@')[0]}! Kamu berhasil menyusun kalimat dengan benar pada *level ${level.toUpperCase()}*!`, m, { mentions: [m.sender] })
+        conn.sendMessage(m.chat, {
+                delete: key
+            })
+        clearTimeout(timeout)
+        delete conn.susunKalimat[m.chat]
     } else if (similarityIndex >= similarityThreshold) {
-        m.reply('Jawaban kamu *hampir benar*! Tapi belum tepat. Coba lagi ya.');
+        m.reply('Jawaban kamu *hampir benar*! Tapi belum tepat. Coba lagi ya.')
     } else if (m.text.toLowerCase() === 'hint') {
         const hint = originalSentence.replace(/[AIUEOaiueo]/ig, '_')
-        m.reply(`🔍 *Clue*: ${hint}`);
+        m.reply(`🔍 *Clue*: ${hint}`)
     }
-};
+}
 
-handler.help = ['susunkalimat'];
-handler.tags = ['game'];
-handler.command = /^(susunkalimat)$/i;
-handler.disabled = false;
+handler.help = ['susunkalimat']
+handler.tags = ['game']
+handler.command = /^(susunkalimat)$/i
+handler.disabled = false
 
-export default handler;
+export default handler
 
 function shuffleSentence(sentence) {
-    const words = sentence.split(' ').filter(word => word !== ''); // Remove empty words
-    for (let i = words.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [words[i], words[j]] = [words[j], words[i]];
+    const words = sentence.split(' ').filter(word => word !== '') // Remove empty words
+    for (let i = words.length - 1 i > 0 i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        [words[i], words[j]] = [words[j], words[i]]
     }
-    return words.join(' ');
+    return words.join(' ')
 }
 
 function jaccardSimilarity(str1, str2) {
   // Menghitung kesamaan menggunakan Jaccard similarity melalui modul similarity
-  const similarityScore = similarity(str1, str2);
+  const similarityScore = similarity(str1, str2)
 
-  return similarityScore;
+  return similarityScore
 }

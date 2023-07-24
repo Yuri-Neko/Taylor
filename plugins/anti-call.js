@@ -22,8 +22,8 @@ export async function all(m, {
 		let cap = 'Kamu Di banned + block + warn + kick oleh bot karena telah melanggar aturan bot\n\n*📮Dilarang menelepon Bot!*'
         await conn.reply(m.chat, cap, m)
 		await delay(1000)
-		global.db.data.users[ban].banned = true
-        global.db.data.users[ban].warning = 1
+		global.db.data.users[m.sender].banned = true
+        global.db.data.users[m.sender].warning = 1
 		await conn.updateBlockStatus(m.chat, "block")
 		await conn.groupParticipantsUpdate(m.chat, [m.sender], "remove")
 	}

@@ -28,7 +28,12 @@ Tingkatkan keanggotaan premium dan nikmati manfaat eksklusif!
 Balas dengan *Y* untuk meningkatkan keanggotaan premium atau *N* untuk membatalkan.
   `, m);
 
-  conn.buyprem[m.chat] = { list: input, hargaPremium, key };
+  conn.buyprem[m.chat] = { list: input, hargaPremium, key, timeout: setTimeout(() => {
+                conn.sendMessage(m.chat, {
+                    delete: key
+                })
+                delete conn.buyprem[m.chat]
+            }, 60 * 1000) };
 };
 
 handler.before = async (m, { conn }) => {
@@ -41,7 +46,7 @@ handler.before = async (m, { conn }) => {
   const input = m.text.trim().toUpperCase();
   if (!/^[YN]$/i.test(input)) return;
 
-  const { list, key, hargaPremium } = conn.buyprem[m.chat];
+  const { list, key, hargaPremium, timeout } = conn.buyprem[m.chat];
   const harga = hargaPremium[list];
 
   if (!m.quoted || m.quoted.id !== key.id || !m.text) return;
@@ -65,9 +70,17 @@ handler.before = async (m, { conn }) => {
       : `🎉 *Selamat! Anda sekarang pengguna premium.* 🎉\n⏳ *Countdown:* ${getCountdownText(now, user.premiumTime)}`;
       
     conn.reply(m.chat, message, m);
+    conn.sendMessage(m.chat, {
+                    delete: key
+                })
+        clearTimeout(timeout)
     delete conn.buyprem[m.chat]; // Remove the session after the user has made a choice
   } else if (input === 'N') {
     conn.reply(m.chat, "✅ *Anda telah membatalkan peningkatan premium.* ✅", m);
+    conn.sendMessage(m.chat, {
+                    delete: key
+                })
+        clearTimeout(timeout)
     delete conn.buyprem[m.chat]; // Remove the session after the user has made a choice
   }
 };

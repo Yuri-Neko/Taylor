@@ -106,9 +106,9 @@ let handler = async (m, { conn, command, args, usedPrefix }) => {
 
         const taskInfo = pickRandom(taskInformation[jobData.task]);
         const randomMessage = pickRandom([
-            `👷 Kamu ${jobData.name} dan sedang ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney * 10)}*\n🔼 Dapatkan *${earnedExp * 10}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
-            `🔧 Sebagai ${jobData.name}, tugasmu adalah ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney * 10)}*\n🔼 Dapatkan *${earnedExp * 10}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
-            `🚜 Sebagai seorang ${jobData.name}, tugasmu adalah ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney * 10)}*\n🔼 Dapatkan *${earnedExp * 10}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
+            `👷 Kamu ${jobData.name} dan sedang ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney * 1000)}*\n🔼 Dapatkan *${earnedExp * 1000}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
+            `🔧 Sebagai ${jobData.name}, tugasmu adalah ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney * 1000)}*\n🔼 Dapatkan *${earnedExp * 1000}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
+            `🚜 Sebagai seorang ${jobData.name}, tugasmu adalah ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney * 1000)}*\n🔼 Dapatkan *${earnedExp * 1000}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
         ]);
 
         m.reply(randomMessage);

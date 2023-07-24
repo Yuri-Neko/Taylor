@@ -1,88 +1,95 @@
-import yts from "yt-search";
+import yts from "yt-search"
+import {
+    generateWAMessageFromContent
+} from "@adiwajshing/baileys"
+import { format } from 'util';
 
-async function handler(m, { conn, args }) {
-conn.ytsData = conn.ytsData ? conn.ytsData : {};
-
-    let query = args.join(" ");
-    if (!query) {
-        return conn.reply(m.chat, "⚠️ Masukkan kata kunci untuk mencari video di YouTube.", m);
-    }
-
-    let results = await yts(query);
-    if (!results || results.videos.length === 0) {
-        return conn.reply(m.chat, "❌ Tidak ditemukan hasil pencarian.", m);
-    }
-
-    let teks = results.videos
-        .map((v, i) => `*${i + 1}.* ${v.title}`)
-        .join("\n");
-
-    let { key } = await conn.reply(
-        m.chat,
-        `🔎 Hasil Pencarian untuk "${query}":\n\n${teks}\n\nBalas pesan ini dengan nomor video yang ingin Anda lihat detailnya.`,
-        m
-    );
-
-    conn.ytsData[m.chat] = {
-        results: results.videos,
-        key: key,
-        timeout: setTimeout(() => {
-            conn.sendMessage(m.chat, { delete: key });
-            delete conn.ytsData[m.chat];
-        }, 60 * 1000)
-    };
+let handler = async (m, {
+    conn,
+    text
+}) => {
+    if (!text) throw "✳️ What do you want me to search for on YouTube?"
+    let results = await yts(text)
+    let tes = results.all
+    let teks = results.all.map(v => {
+        switch (v.type) {
+            case "video":
+                return `
+📹 *Type:* ${v.type}
+🆔 *VideoId:* ${v.videoId}
+🔗 *URL:* ${v.url}
+📺 *Title:* ${v.title}
+📝 *Description:* ${v.description}
+🖼️ *Image:* ${v.image}
+🖼️ *Thumbnail:* ${v.thumbnail}
+⏱️ *Seconds:* ${v.seconds}
+⏰ *Timestamp:* ${v.timestamp}
+⏲️ *Duration Timestamp:* ${v.duration.timestamp}
+⌛ *Duration Seconds:* ${v.duration.seconds}
+⌚ *Ago:* ${v.ago}
+👀 *Views:* ${formatNumber(v.views)}
+👤 *Author Name:* ${v.author.name}
+🔗 *Author URL:* ${v.author.url}
+   `.trim()
+            case "canal":
+                return `
+🔖 *${v.name}* (${v.url})
+⚡ ${v.subCountLabel} (${v.subCount}) Suscribe
+📽️ ${v.videoCount} videos
+`.trim()
+        }
+    }).filter(v => v).join("\n\n________________________\n\n")
+    
+        let ytthumb = await (await conn.getFile(tes[0].thumbnail)).data
+        let msg = await generateWAMessageFromContent(m.chat, {
+            extendedTextMessage: {
+                text: teks,
+                jpegThumbnail: ytthumb,
+                contextInfo: {
+                    mentionedJid: [m.sender],
+                    externalAdReply: {
+                        body: "S E A R C H",
+                        containsAutoReply: true,
+                        mediaType: 1,
+                        mediaUrl: tes[0].url,
+                        renderLargerThumbnail: true,
+                        showAdAttribution: true,
+                        sourceId: "WudySoft",
+                        sourceType: "PDF",
+                        previewType: "PDF",
+                        sourceUrl: tes[0].url,
+                        thumbnail: ytthumb,
+                        thumbnailUrl: tes[0].thumbnail,
+                        title: htki + " Y O U T U B E " + htka
+                    }
+                }
+            }
+        }, {
+            quoted: m
+        })
+        await conn.relayMessage(m.chat, msg.message, {})
 }
+handler.help = ["", "earch"].map(v => "yts" + v + " <pencarian>")
+handler.tags = ["tools"]
+handler.command = /^y(outubesearch|ts(earch)?)$/i
+export default handler
 
-handler.before = async (m, { conn }) => {
-conn.ytsData = conn.ytsData ? conn.ytsData : {};
-    if (m.isBaileys || !(m.chat in conn.ytsData)) return;
+function formatNumber(num) {
+  const suffixes = ['', 'k', 'M', 'B', 'T'];
+  const numString = Math.abs(num).toString();
+  const numDigits = numString.length;
 
-    let { timeout, results, key } = conn.ytsData[m.chat];
-    if (!m.quoted || m.quoted.id !== key.id || !m.text) return;
+  if (numDigits <= 3) {
+    return numString;
+  }
 
-    let choice = m.text.trim();
-    let numChoice = Number(choice);
+  const suffixIndex = Math.floor((numDigits - 1) / 3);
+  let formattedNum = (num / Math.pow(1000, suffixIndex)).toFixed(1);
+  
+  // Menghapus desimal jika angka sudah bulat
+  if (formattedNum.endsWith('.0')) {
+    formattedNum = formattedNum.slice(0, -2);
+  }
 
-    if (isNaN(numChoice) || numChoice < 1 || numChoice > results.length) {
-    await conn.reply(m.chat, "⚠️ Masukkan nomor video yang valid.", m);
-  } else {
-    let video = results[numChoice - 1];
-    let teksDetail = `
-📹 *Detail Video*
-📺 Judul: ${video.title}
-👀 Views: ${video.views}
-⏱️ Durasi: ${video.timestamp}
-⌚ Diunggah Oleh: ${video.author.name}
-🔗 Link: ${video.url}
-📝 Deskripsi: ${video.description}
-🖼️ Gambar: ${video.image}
-🖼️ Thumbnail: ${video.thumbnail}
-⏰ Waktu: ${video.timestamp}
-⏲️ Durasi Timestamp: ${video.duration.timestamp}
-⌛ Durasi Detik: ${video.duration.seconds}
-👤 Nama Penulis: ${video.author.name}
-🔗 URL Penulis: ${video.author.url}
-`.trim();
-
-    await conn.reply(m.chat, teksDetail, m);
-    clearTimeout(timeout);
-
-    // Periksa apakah pengguna membalas dengan nomor yang valid untuk mengunduh video
-    if (!isNaN(numChoice) && numChoice >= 1 && numChoice <= results.length) {
-        let selectedVideo = results[numChoice - 1];
-        await conn.reply(
-            m.chat,
-            `📥 Unduh video "${selectedVideo.title}": ${selectedVideo.url}`,
-            m
-        );
-    }
-
-    //delete conn.ytsData[m.chat];
-    }
-};
-
-handler.help = ['yts', 'youtubesearch', 'ytsearch'].map(v => v + ' [kata kunci]');
-handler.tags = ['downloader'];
-handler.command = /^(yts|youtubesearch|ytsearch)$/i;
-
-export default handler;
+  return formattedNum + suffixes[suffixIndex];
+}

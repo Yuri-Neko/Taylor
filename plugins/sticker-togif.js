@@ -10,9 +10,15 @@ if (!m.quoted) throw `balas stiker dengan caption *${usedPrefix + command}*`
     if (/webp/g.test(mime)) {
         out = await webp2mp4(media)
     }
-    conn.sendFile(m.chat, out, 'out.gif', m, false, { mimetype: 'video/gif', thumbnail: Buffer.alloc(0) })
+    await conn.sendMessage(m.chat, {
+                video: { url: out },
+                caption: '✅ sticker a gif',
+                gifPlayback: true,
+                gifAttribution: Math.floor(Math.random() * 2) + 1
+            }, {
+                quoted: m
+            })
 }
-
 handler.help = ['togif (reply media)']
 handler.tags = ['sticker']
 handler.command = /^togifs?$/i
