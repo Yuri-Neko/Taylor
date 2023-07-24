@@ -33,8 +33,6 @@ export async function before(m) {
                 console.log('Erorr');
             }
             }
-    } else {
-        console.log('URL TikTok Tidak Valid');
     }
 
 }

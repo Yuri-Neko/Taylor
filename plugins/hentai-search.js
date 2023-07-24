@@ -1,8 +1,6 @@
 import cheerio from 'cheerio';
 import fetch from 'node-fetch';
 
-let optionsData = {};
-
 const getHentaiList = async () => {
   const page = Math.floor(Math.random() * 1153);
   const response = await fetch(`https://sfmcompile.club/page/${page}`);
@@ -36,24 +34,31 @@ const getCaption = (obj) => `
 `;
 
 const handler = async (m, { conn }) => {
+conn.hentaiVid = conn.hentaiVid ? conn.hentaiVid : {};
+
   const list = await getHentaiList();
   const teks = list.map((obj, index) => `*${index + 1}.* ${obj.title}`).join('\n');
   let { key } = await conn.reply(m.chat, `🔧 Daftar Hasil:\n\n${teks}\n\nBalas pesan ini dengan nomor video yang ingin ditampilkan.`, m);
-  optionsData[m.chat] = { list, key, timeout: setTimeout(() => { /*conn.sendMessage(m.chat, { delete: key }); delete optionsData[m.chat];*/ }, 60 * 1000), pesan: conn };
+  conn.hentaiVid[m.chat] = { list, key, timeout: setTimeout(() => { conn.sendMessage(m.chat, { delete: key }); delete conn.hentaiVid[m.chat]; }, 1000)};
 };
 
-handler.before = async m => {
-  if (!optionsData[m.chat]) return;
-  const { list, key, pesan } = optionsData[m.chat];
+handler.before = async (m, { conn }) => {
+conn.hentaiVid = conn.hentaiVid ? conn.hentaiVid : {};
+if (m.isBaileys || !(m.chat in conn.hentaiVid)) return;
+
+  if (!conn.hentaiVid[m.chat]) return;
+  const { list, key } = conn.hentaiVid[m.chat];
+  if (!m.quoted || m.quoted.id !== key.id || !m.text) return;
   const index = parseInt(m.text.trim());
 
-  if (m.isBaileys || isNaN(index) || index < 1 || index > list.length) return;
-  
+  if (isNaN(index) || index < 1 || index > list.length) {
+  await conn.reply(m.chat, "⚠️ Masukkan nomor video yang valid.", m);
+  } else {
   const selectedObj = list[index - 1];
-  await pesan.sendFile(m.chat, selectedObj.video_1, '', getCaption(selectedObj), m);
-  //await pesan.sendMessage(m.chat, { delete: key });
-  //clearTimeout(optionsData[m.chat].timeout);
-  //delete optionsData[m.chat];
+  await conn.sendFile(m.chat, selectedObj.video_1, '', getCaption(selectedObj), m);
+  clearTimeout(conn.hentaiVid[m.chat].timeout);
+  delete conn.hentaiVid[m.chat];
+  }
 };
 
 handler.help = ["hentaivid", "hentaimp4", "hentaivideo"];

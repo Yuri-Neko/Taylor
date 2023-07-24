@@ -1,8 +1,8 @@
 import yts from "yt-search";
 
-let ytsData = {};
-
 async function handler(m, { conn, args }) {
+conn.ytsData = conn.ytsData ? conn.ytsData : {};
+
     let query = args.join(" ");
     if (!query) {
         return conn.reply(m.chat, "⚠️ Masukkan kata kunci untuk mencari video di YouTube.", m);
@@ -23,31 +23,29 @@ async function handler(m, { conn, args }) {
         m
     );
 
-    ytsData[m.chat] = {
+    conn.ytsData[m.chat] = {
         results: results.videos,
         key: key,
         timeout: setTimeout(() => {
             conn.sendMessage(m.chat, { delete: key });
-            delete ytsData[m.chat];
-        }, 60 * 1000),
-        pesan: conn
+            delete conn.ytsData[m.chat];
+        }, 60 * 1000)
     };
 }
 
-handler.before = async m => {
-    if (m.isBaileys || !(m.chat in ytsData)) return;
+handler.before = async (m, { conn }) => {
+conn.ytsData = conn.ytsData ? conn.ytsData : {};
+    if (m.isBaileys || !(m.chat in conn.ytsData)) return;
 
-    let { timeout, results, key, pesan } = ytsData[m.chat];
+    let { timeout, results, key } = conn.ytsData[m.chat];
     if (!m.quoted || m.quoted.id !== key.id || !m.text) return;
 
     let choice = m.text.trim();
     let numChoice = Number(choice);
 
     if (isNaN(numChoice) || numChoice < 1 || numChoice > results.length) {
-        await pesan.reply(m.chat, "⚠️ Masukkan nomor video yang valid.", m);
-        return;
-    }
-
+    await conn.reply(m.chat, "⚠️ Masukkan nomor video yang valid.", m);
+  } else {
     let video = results[numChoice - 1];
     let teksDetail = `
 📹 *Detail Video*
@@ -66,20 +64,21 @@ handler.before = async m => {
 🔗 URL Penulis: ${video.author.url}
 `.trim();
 
-    await pesan.reply(m.chat, teksDetail, m);
+    await conn.reply(m.chat, teksDetail, m);
     clearTimeout(timeout);
 
     // Periksa apakah pengguna membalas dengan nomor yang valid untuk mengunduh video
     if (!isNaN(numChoice) && numChoice >= 1 && numChoice <= results.length) {
         let selectedVideo = results[numChoice - 1];
-        await pesan.reply(
+        await conn.reply(
             m.chat,
             `📥 Unduh video "${selectedVideo.title}": ${selectedVideo.url}`,
             m
         );
     }
 
-    //delete ytsData[m.chat];
+    //delete conn.ytsData[m.chat];
+    }
 };
 
 handler.help = ['yts', 'youtubesearch', 'ytsearch'].map(v => v + ' [kata kunci]');

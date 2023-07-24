@@ -1,38 +1,75 @@
-import fetch from 'node-fetch'
+import fetch from 'node-fetch';
 
-let handler = async (m, { conn, args, usedPrefix, command }) => {
-try {
-if (args[0] && !args[1]) {
-    if (!isNumber(args[0])) throw `Contoh:\n${usedPrefix + command} 1\n\nMaka hasilnya adalah surah Al-Fatihah ayat beserta audionya, dan ayatnya 1 aja`
-    let f = await fetch("https://quran-wudy.vercel.app/surah/" + args[0])
-    let xx = await f.json()
-    
-    let listSections = []
-	Object.values(xx.data.verses).map((v, index) => {
-	listSections.push(["Model [ " + ++index + " ]", [
-          [v.text.arab + "\n\n", usedPrefix + "get " + v.audio.primary, "•"]
-        ]])
-	})
-	m.reply(wait)
-	return conn.sendList(m.chat, htki + " 📺 Models 🔎 " + htka, `⚡ Silakan pilih Model di tombol di bawah...\n*Teks yang anda kirim:* ${args[0]}\n\nKetik ulang *${usedPrefix + command}* teks anda untuk mengubah teks lagi`, author, "☂️ M O D E L ☂️", listSections, m)
-	} else if (args[0] && args[1]) {
-	if (!isNumber(args[0]) && !isNumber(args[1])) throw `Contoh:\n${usedPrefix + command} 1\n\nMaka hasilnya adalah surah Al-Fatihah ayat beserta audionya, dan ayatnya 1 aja`
-    let f = await fetch("https://quran-wudy.vercel.app/surah/" + args[0] + "/" + args[1])
-    let xx = await f.json()
-    var cp = `*Arab:* ${xx.data.text.arab}`
-    m.reply(wait)
-m.reply(cp)
-await conn.sendMessage(m.chat, { audio: { url: xx.data.audio.primary }, seconds: fsizedoc, ptt: true, mimetype: "audio/mpeg", fileName: "vn.mp3", waveform: [100,0,100,0,100,0,100] }, { quoted: m })
-	}
-	} catch (e) {
-	throw eror
-	}
-}
-handler.help = ['alquran'].map(v => v + ' <no surah>')
-handler.tags = ['qurann']
-handler.command = /^(al)?qurann$/i
+const fetchQuranData = async (surahNumber) => {
+  try {
+    const response = await fetch(`https://quran-wudy.vercel.app/surah/${surahNumber}`);
+    const data = await response.json();
+    return data.data.verses;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
 
-export default handler
-function isNumber(x) {
-    return !isNaN(x)
-}
+const handler = async (m, { conn }) => {
+conn.qurannData = conn.qurannData ? conn.qurannData : {};
+
+  const surahNumber = parseInt(m.text.split(' ')[1]);
+  if (isNaN(surahNumber) || surahNumber < 1 || surahNumber > 114) {
+    m.reply("❌ Invalid surah number. Please provide a valid surah number between 1 and 114.");
+    return;
+  }
+
+  const ayahs = await fetchQuranData(surahNumber);
+  if (!ayahs) {
+    m.reply("Failed to fetch Quran data.");
+    return;
+  }
+
+  const formattedList = Object.values(ayahs).map(v => (
+    `*${v.number.inSurah}.* ${v.text.arab}`
+  )).join('\n');
+
+  const instructions = "Reply to this message with the desired ayah number to receive the audio.";
+
+  let { key } = await m.reply(`📖 List of Ayahs in Surah ${surahNumber}:\n${formattedList}\n\n${instructions}`);
+  // Store the Quran data in conn.qurannData variable for later use
+  conn.qurannData[m.chat] = { list: Object.values(ayahs), key, timeout: setTimeout(() => { conn.sendMessage(m.chat, { delete: key }); delete conn.qurannData[m.chat]; }, 1000)};
+};
+
+handler.before = async (m, { conn }) => {
+conn.qurannData = conn.qurannData ? conn.qurannData : {};
+
+if (m.isBaileys || !(m.chat in conn.qurannData)) return;
+  const input = m.text.trim();
+  if (!/^\d+$/.test(input)) return; // If the input is not a number, do nothing
+
+  const { list, key } = conn.qurannData[m.chat];
+  if (!m.quoted || m.quoted.id !== key.id || !m.text) return;
+  const index = parseInt(input);
+
+  if (isNaN(index) || index < 1 || index > list.length) {
+    m.reply("❌ Invalid ayah number. Please provide a valid ayah number from the list.");
+  } else {
+  const selectedObj = list[index - 1];
+
+  // Check if the message is a reply and the quoted message id matches the key.id from the list
+    await conn.sendMessage(m.chat, {
+      audio: {
+        url: selectedObj.audio.primary,
+      },
+      mimetype: "audio/mpeg",
+      filename: "quran_audio.mp3",
+      ptt: true,
+    }, { quoted: m });
+
+    clearTimeout(conn.qurannData[m.chat].timeout);
+    delete conn.qurannData[m.chat];
+  }
+};
+
+handler.help = ["qurann"];
+handler.tags = ["search"];
+handler.command = /^qurann$/i;
+
+export default handler;

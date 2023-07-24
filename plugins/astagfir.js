@@ -1,28 +1,32 @@
-let handler = async (m) => {
+const handler = async (m, { conn, text }) => {
     let user = global.db.data.users[m.sender]
-    if (user.warning == 0) throw 'Kamu tidak memiliki warning!'
+    if (!user.warn) throw 'Kamu tidak memiliki peringatan (warning)!'
 
-    let waktu = user.lastIstigfar + 180000
-    if (new Date - user.lastIstigfar < 180000) throw `Kamu bisa menggunakan perintah ini lagi setelah ${msToTime(waktu - new Date())}`
-    user.warning -= 1
-    m.reply(`Warning: ${user.warning} / 10`)
-    user.lastIstigfar = new Date * 1
+    if (user.lastIstigfar && user.lastIstigfar + 3600000 > Date.now()) {
+        throw `Tunggu setelah ${msToTime(user.lastIstigfar + 3600000 - Date.now())}`
+    }
+
+    user.warn = Math.max(0, user.warn - 1)
+    m.reply(`Sisa peringatan (warning) kamu: ${user.warn} / 10`)
+
+    if (user.warn === 0) {
+        m.reply('Hati-hati! Ini adalah peringatan terakhir kamu. Jika kamu melanggar lagi, kamu akan dikenai sanksi.')
+    }
+
+    user.lastIstigfar = Date.now()
+
+    setTimeout(() => {
+        conn.reply(m.chat, '⏰ Waktunya menggunakan perintah lagi!\nKetik *.maaf* untuk mengurangi warn.', m);
+    }, 3600000);
 }
-handler.command = /^(astagh?fir(ullah)?|maaf)$/i
 
+handler.command = /^(astagh?fir(ullah)?|maaf)$/i
 handler.limit = true
 
 export default handler
 
 function msToTime(duration) {
-    var milliseconds = parseInt((duration % 1000) / 100),
-        seconds = Math.floor((duration / 1000) % 60),
-        minutes = Math.floor((duration / (1000 * 60)) % 60),
-        hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
-
-    hours = (hours < 10) ? "0" + hours : hours
-    minutes = (minutes < 10) ? "0" + minutes : minutes
-    seconds = (seconds < 10) ? "0" + seconds : seconds
-
-    return minutes + " menit " + seconds + " detik"
+    const minutes = Math.floor(duration / (1000 * 60))
+    const seconds = Math.floor((duration / 1000) % 60)
+    return `${minutes} menit ${seconds} detik`
 }

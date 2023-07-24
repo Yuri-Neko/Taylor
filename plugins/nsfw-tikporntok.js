@@ -1,8 +1,6 @@
 import cheerio from 'cheerio';
 import fetch from 'node-fetch';
 
-let optionsData = {};
-
 const getTikPornData = async () => {
   try {
     const response = await fetch('https://tikporntok.com/?random=1');
@@ -40,23 +38,33 @@ const getCaption = (obj) => `
 `;
 
 const handler = async (m, { conn }) => {
+conn.tikPorntok = conn.tikPorntok ? conn.tikPorntok : {};
+
   const list = await getTikPornData();
   const teks = list.map((obj, index) => `*${index + 1}.* ${obj.title}`).join('\n');
   const { key } = await conn.reply(m.chat, `🔧 Daftar Video TikPorn:\n\n${teks}\n\nBalas pesan ini dengan nomor video yang ingin ditampilkan.`, m);
-  optionsData[m.chat] = { list, key, timeout: setTimeout(() => { conn.sendMessage(m.chat, { delete: key }); /*delete optionsData[m.chat];*/ }, 60 * 1000), pesan: conn };
+  conn.tikPorntok[m.chat] = { list, key, timeout: setTimeout(() => { conn.sendMessage(m.chat, { delete: key }); delete conn.tikPorntok[m.chat]; }, 1000)};
 };
 
-handler.before = async m => {
-  if (!optionsData[m.chat]) return;
-  const { list, key, pesan } = optionsData[m.chat];
-  const index = parseInt(m.text.trim());
+handler.before = async (m, { conn }) => {
+conn.tikPorntok = conn.tikPorntok ? conn.tikPorntok : {};
 
-  if (m.isBaileys || isNaN(index) || index < 1 || index > list.length) return;
-  
-  const selectedObj = list[index - 1];
-  await pesan.sendFile(m.chat, selectedObj.video, '', getCaption(selectedObj), m);
-  clearTimeout(optionsData[m.chat].timeout);
-  //delete optionsData[m.chat];
+  if (m.isBaileys || !(m.chat in conn.tikPorntok)) return;
+
+  const { list, key } = conn.tikPorntok[m.chat];
+  if (!m.quoted || m.quoted.id !== key.id || !m.text) return;
+
+  const choice = m.text.trim();
+  const numChoice = Number(choice);
+
+  if (isNaN(numChoice) || numChoice < 1 || numChoice > list.length) {
+    await conn.reply(m.chat, "⚠️ Masukkan nomor video yang valid.", m);
+  } else {
+  const position = list[numChoice - 1];
+  await conn.sendFile(m.chat, position.video, '', getCaption(position), m);
+  clearTimeout(conn.tikPorntok[m.chat].timeout);
+    delete conn.tikPorntok[m.chat];
+  }
 };
 
 handler.help = ["tikporn", "tikporntok", "tiktokporn"];

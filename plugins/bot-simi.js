@@ -1,21 +1,30 @@
+import fetch from 'node-fetch';
 
-import fetch from 'node-fetch'
+export async function before(m) {
+  if (m.isBaileys || !global.db.data.chats[m.chat]?.simi || !m.text) return false;
 
-export async function before(m, { isAdmin, isBotAdmin }) {
-if (m.isBaileys && m.fromMe)
-        return !0
-    if (!m.isGroup) return !1
-    let chat = global.db.data.chats[m.chat]
-    let bot = global.db.data.settings[this.user.jid] || {}
-    if (chat.simi) {
+  const text = m.text.replace(/[^\x00-\x7F]/g, '').trim();
+  if (!text) return false;
+
+  const urls = [
+    `https://api.simsimi.net/v2/?text=${encodeURIComponent(text)}&lc=id`,
+    `http://api.brainshop.ai/get?bid=153868&key=rcKonOgrUFmn5usX&uid=1&msg=${encodeURIComponent(text)}`
+  ];
+
+  for (const url of urls) {
     try {
-        let api = await fetch("https://api.simsimi.net/v2/?text=" + encodeURIComponent(m.text) + "&lc=id")
-  let res = await api.json()
-  m.reply(`*Simi:* ${res.success}`)
-  } catch (e) {
-  let api = await fetch("http://api.brainshop.ai/get?bid=153868&key=rcKonOgrUFmn5usX&uid=1&msg=" + encodeURIComponent(m.text))
-  let res = await api.json()
-  m.reply(`*Simi:* ${res.cnt}`)
-  }
+      const api = await fetch(url);
+      const res = await api.json();
+
+      if (res.success || res.cnt) {
+        await this.reply(m.chat, `*Simi says:*\n${res.success || res.cnt}`, m);
+        return true;
+      }
+    } catch {
+      continue;
     }
+  }
+
+  await this.reply(m.chat, `*Simi eror*`, m);
+  return true;
 }

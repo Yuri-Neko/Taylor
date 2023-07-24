@@ -1,22 +1,70 @@
-let handler = async(m, { conn, args, usedPrefix }) => {
+let handler = async (m, { conn, args, usedPrefix }) => {
+  const user = global.db.data.users[m.sender];
+  const today = new Date().toLocaleDateString();
+  const cooldownDuration = 86400000; // 1 day in milliseconds
 
-    if (args.length == 0) return conn.reply(m.chat, `Harap masukan Kode FreeGiftmu!`, m)
-    if (args[0] == 'fangzbot_091' || args[0] == 'followfangz_' || args[0] == 'BloowwXx' || args[0] == 'BbL016JJQBCSr54OwwW0' || args[0] == 'giftkey01389320007' || args[0] == 'kode013923') {
+  // Merge codes from conn.freegift[m.sender].code array with validGiftCodes (removing duplicates)
+  const validGiftCodes = [
+    ...new Set([
+      'code',
+      'followfangz_',
+      'BloowwXx',
+      'BbL016JJQBCSr54OwwW0',
+      'giftkey01389320007',
+      'kode013923',
+      ...(conn.freegift && conn.freegift[m.sender] && conn.freegift[m.sender].code ? conn.freegift[m.sender].code : [])
+    ])
+  ];
 
-    if (new Date - global.db.data.users[m.sender].lastgift > 86400000) {
-       conn.reply(m.chat, '*🎉 SELAMAT!*\nKamu telah mendapatkan\n1000 XP ✨\n 1 Limit! 🎫\n1000 Money 💹\n1 Potion 🥤', m)
-    global.db.data.users[m.sender].exp += 1000
-    global.db.data.users[m.sender].limit += 1
-    global.db.data.users[m.sender].money +=1000
-    global.db.data.users[m.sender].potion += 1
-    global.db.data.users[m.sender].lastclaim = new Date * 1
-} else conn.reply(m.chat, '[❗] Kode Gift Gratis hanya dapat digunakan sehari sekali ! dan kode hanya bisa di pakai sekali !\n\nKetik *!buygift* untuk membeli kodegift premium', m)
-   } else {
-        conn.reply(m.chat, `*「 KODE FREE TIDAK VALID 」*`, m)
-    }
+  if (conn.freegift && conn.freegift[m.sender] && conn.freegift[m.sender].time === today) {
+    const remainingCooldown = user.lastGift + cooldownDuration - new Date();
+    const remainingTime = getRemainingTime(remainingCooldown);
+
+    return conn.reply(m.chat, `🎁 Kamu sudah menggunakan kode Gift Gratis hari ini. Kode Gift hanya bisa digunakan sekali sehari!\n\nKode Gift Gratis dapat digunakan kembali setelah:\n${remainingTime}\n\nKetik *${usedPrefix}buygift* untuk membeli kode gift premium`, m);
+  }
+
+  if (!args[0]) {
+    return conn.reply(m.chat, `❓ Kamu belum memasukkan Kode FreeGiftmu!\n\nContoh: *${usedPrefix}freegift code*`, m);
+  }
+
+  if (validGiftCodes.includes(args[0])) {
+    conn.reply(m.chat, '*🎉 SELAMAT!*\nKamu telah mendapatkan:\n💠 1000 XP\n🎫 1 Limit\n💹 1000 Money\n🥤 1 Potion', m);
+    user.exp += 1000;
+    user.limit += 1;
+    user.money += 1000;
+    user.potion += 1;
+
+    // Set the session to mark that the user has used the gift code today
+    if (!conn.freegift) conn.freegift = {};
+    conn.freegift[m.sender] = { time: today };
+
+    // Set timeout for gift code usage (1 day)
+    setTimeout(() => {
+      delete conn.freegift[m.sender];
+      conn.reply(m.chat, '⏰ Waktunya menggunakan FreeGift lagi!\nKetik *freegift* untuk mendapatkan hadiah spesial.', m);
+    }, cooldownDuration);
+  } else {
+    conn.reply(m.chat, `*❌ KODE FREE TIDAK VALID  ❌*\nSilakan periksa kembali Kode FreeGift yang kamu masukkan.\n\nContoh: *${usedPrefix}freegift code*`, m);
+  }
+};
+
+handler.help = ['freegift <kode>'];
+handler.tags = ['rpg'];
+handler.command = /^freegift$/i;
+
+export default handler;
+
+function getRemainingTime(ms) {
+  let days = Math.floor(ms / 86400000);
+  let hours = Math.floor((ms % 86400000) / 3600000);
+  let minutes = Math.floor((ms % 3600000) / 60000);
+  let seconds = Math.floor((ms % 60000) / 1000);
+
+  let remainingTime = '';
+  if (days > 0) remainingTime += `${days} hari `;
+  if (hours > 0) remainingTime += `${hours} jam `;
+  if (minutes > 0) remainingTime += `${minutes} menit `;
+  if (seconds > 0) remainingTime += `${seconds} detik`;
+
+  return remainingTime.trim();
 }
-handler.help = ['freegift <kode>']
-handler.tags = ['rpg']
-handler.command = /^(freegift)$/i
-
-export default handler 

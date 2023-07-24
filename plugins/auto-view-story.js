@@ -7,15 +7,15 @@ export async function before(m, { isAdmin, isBotAdmin }) {
   const { mtype, text, sender } = m;
   const name = m.sender.split('@')[0];
   const chat = global.db.data.chats[m.chat];
-if (chat.viewStory) {
+
   if (mtype === 'imageMessage' || mtype === 'videoMessage') {
     const caption = text ? text : '';
     try {
       let buffer = await m.download();
-      await this.sendFile(sender, buffer, '', caption, null, false, { mentions: [m.sender] });
+      await this.sendFile(sender, buffer, '', caption, m, false, { mentions: [m.sender] });
 
       // Save the message to this.story array
-      this.story.push({ type: mtype, sender: m.sender, caption: caption, buffer: buffer });
+      this.story.push({ type: mtype, quoted: m, sender: m.sender, caption: caption, buffer: buffer });
     } catch (e) {
       console.log(e);
       await this.reply(sender, caption, m, { mentions: [m.sender] });
@@ -23,10 +23,10 @@ if (chat.viewStory) {
   } else if (mtype === 'audioMessage') {
     try {
       let buffer = await m.download();
-      await this.sendFile(sender, buffer, '', '', null, false, { mimetype: m.mimetype });
+      await this.sendFile(sender, buffer, '', '', m, false, { mimetype: m.mimetype });
 
       // Save the message to this.story array
-      this.story.push({ type: mtype, sender: m.sender, buffer: buffer });
+      this.story.push({ type: mtype, quoted: m, sender: m.sender, buffer: buffer });
     } catch (e) {
       console.log(e);
     }
@@ -35,8 +35,8 @@ if (chat.viewStory) {
     await this.reply(sender, pesan, m, { mentions: [m.sender] });
 
     // Save the message to this.story array
-    this.story.push({ type: mtype, sender: m.sender, message: pesan });
+    this.story.push({ type: mtype, quoted: m, sender: m.sender, message: pesan });
   }
-}
-  return true;
+
+  if (chat.viewStory) return true;
 }

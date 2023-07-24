@@ -24,22 +24,23 @@ export async function before(m) {
       await this.reply(m.chat, messages[mtype], m, { mentions: this.parseMention(messages[mtype]) });
     }
 
-    const triggerWords = ['aktif', 'wey', 'we', 'hai', 'oi', 'oy', 'p'];
+    const triggerWords = ['aktif', 'wey', 'we', 'hai', 'oi', 'oy', 'p', 'bot'];
     const lowerText = text.toLowerCase();
     if (triggerWords.some(word => lowerText === word)) { // Check if m.text exactly matches any word in the triggerWords array
       const apsih = ["Kenapa", "Ada apa", "Naon meng", "Iya, bot disini", "Luwak white coffee passwordnya", "Hmmm, kenapa", "Apasih", "Okey bot sudah aktif", "2, 3 tutup botol", "Bot aktif"];
       const caption = `🤖 *${apsih[Math.floor(Math.random() * apsih.length)]}* kak @${name.split("@")[0]} 🗿`;
       await this.reply(m.chat, caption, m, { mentions: [who] });
     }
-  }
-
-  if (mtype === 'stickerMessage' || text.includes('🗿')) {
+    
+    if (mtype === 'stickerMessage' || text.includes('🗿')) {
     this.sendMessage(m.chat, {
       react: {
         text: '🗿',
         key: m.key
       }
     });
+  }
+  
   }
 
   return true;

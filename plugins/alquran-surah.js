@@ -1,45 +1,75 @@
-import fetch from 'node-fetch'
+import fetch from 'node-fetch';
 
-let handler = async (m, { conn, args, usedPrefix, command }) => {
-try {
-    if (!isNumber(args[0])) throw `Contoh:\n${usedPrefix + command} 1\n\nMaka hasilnya adalah surah Al-Fatihah ayat beserta audionya, dan ayatnya 1 aja`
-    let f = await fetch("https://api.alquran.cloud/v1/surah/" + args[0] + "/ar.alafasy")
-    let xx = await f.json()
-    
-    if (args[0] && !args[1]) {
-    let listSections = []
-	Object.values(xx.data.ayahs).map((v, index) => {
-	var cp = `*Number:* ${v.number}
-*Number In Surah:* ${v.numberInSurah}
-*Juz:* ${v.juz}
-*Manzil:* ${v.manzil}
-*Page:* ${v.page}
-*Ruku:* ${v.ruku}
-*Hizb Quarter:* ${v.hizbQuarter}
-`
-	listSections.push(["Model [ " + ++index + " ]", [
-          [v.text + "\n\n", usedPrefix + "get " + v.audio, cp]
-        ]])
-	})
-	m.reply(wait)
-	return conn.sendList(m.chat, htki + " 📺 Models 🔎 " + htka, `⚡ Silakan pilih Model di tombol di bawah...\n*Teks yang anda kirim:* ${args[0]}\n\nKetik ulang *${usedPrefix + command}* teks anda untuk mengubah teks lagi`, author, "☂️ M O D E L ☂️", listSections, m)
-	} else if (args[0] && args[1]) {
-	if (!isNumber(args[0]) && !isNumber(args[1])) throw `Contoh:\n${usedPrefix + command} 1\n\nMaka hasilnya adalah surah Al-Fatihah ayat beserta audionya, dan ayatnya 1 aja`
-    var ay = xx.data.ayahs[args[1]]
-    var cy = `*Arab:* ${ay.text}`
-    m.reply(wait)
-m.reply(cy)
-await conn.sendMessage(m.chat, { audio: { url: ay.audio }, seconds: fsizedoc, ptt: true, mimetype: "audio/mpeg", fileName: "vn.mp3", waveform: [100,0,100,0,100,0,100] }, { quoted: m })
-	}
-	} catch (e) {
-	throw eror
-	}
-}
-handler.help = ['alqurans'].map(v => v + ' <no surah>')
-handler.tags = ['qurans']
-handler.command = /^(al)?qurans$/i
+const fetchQuranData = async (surahNumber) => {
+  try {
+    const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/ar.alafasy`);
+    const data = await response.json();
+    return data.data.ayahs;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
 
-export default handler
-function isNumber(x) {
-    return !isNaN(x)
-}
+const handler = async (m, { conn }) => {
+conn.quransData = conn.quransData ? conn.quransData : {};
+
+  const surahNumber = parseInt(m.text.split(' ')[1]);
+  if (isNaN(surahNumber) || surahNumber < 1 || surahNumber > 114) {
+    m.reply("❌ Invalid surah number. Please provide a valid surah number between 1 and 114.");
+    return;
+  }
+
+  const ayahs = await fetchQuranData(surahNumber);
+  if (!ayahs) {
+    m.reply("Failed to fetch Quran data.");
+    return;
+  }
+
+  const formattedList = Object.values(ayahs).map(v => (
+    `*${v.numberInSurah}.* ${v.text}`
+  )).join('\n');
+
+  const instructions = "Reply to this message with the desired ayah number to receive the audio.";
+
+  let { key } = await m.reply(`📖 List of Ayahs in Surah ${surahNumber}:\n${formattedList}\n\n${instructions}`);
+  // Store the Quran data in conn.quransData variable for later use
+  conn.quransData[m.chat] = { list: Object.values(ayahs), key, timeout: setTimeout(() => { conn.sendMessage(m.chat, { delete: key }); delete conn.quransData[m.chat]; }, 1000)};
+};
+
+handler.before = async (m, { conn }) => {
+conn.quransData = conn.quransData ? conn.quransData : {};
+
+if (m.isBaileys || !(m.chat in conn.quransData)) return;
+  const input = m.text.trim();
+  if (!/^\d+$/.test(input)) return; // If the input is not a number, do nothing
+
+  const { list, key } = conn.quransData[m.chat];
+  if (!m.quoted || m.quoted.id !== key.id || !m.text) return;
+  const index = parseInt(input);
+
+  if (isNaN(index) || index < 1 || index > list.length) {
+    m.reply("❌ Invalid ayah number. Please provide a valid ayah number from the list.");
+  } else {
+  const selectedObj = list[index - 1];
+
+  // Check if the message is a reply and the quoted message id matches the key.id from the list
+    await conn.sendMessage(m.chat, {
+      audio: {
+        url: selectedObj.audio,
+      },
+      mimetype: "audio/mpeg",
+      filename: "quran_audio.mp3",
+      ptt: true,
+    }, { quoted: m });
+
+    clearTimeout(conn.quransData[m.chat].timeout);
+    delete conn.quransData[m.chat];
+  }
+};
+
+handler.help = ["qurans"];
+handler.tags = ["search"];
+handler.command = /^qurans$/i;
+
+export default handler;
