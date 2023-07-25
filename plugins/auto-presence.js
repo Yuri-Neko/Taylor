@@ -1,39 +1,38 @@
-let typing = {}
-
-export async function before(m) {
-    let chat = global.db.data.chats[m.chat]
-    let prefix = global.prefix || /^([.!#])/
-    
-    if (chat.autoPesence) {
-        if (prefix.test(m.text)) {
-            /* MeReact jika ada kemiripan dengan help */
-            let help = Object.values(plugins).filter(v => v.help && !v.disabled).map(v => v.help).flat(1)
-            let noPrefix = m.text.replace(prefix, '')
-            if (help.some(h => h.includes(noPrefix))) {
-                this.sendMessage(m.chat, {
-                    react: {
-                        text: '⌛',
-                        key: m.key,
-                    }
-                })
-            }
-        } else {
-            /* Cek apakah ada teks baru atau teks diulang */
-            if (m.sender in typing) {
-                clearTimeout(typing[m.sender])
-                delete typing[m.sender]
-                /* Presence (Composing) dihapus karena ada teks baru */
-                this.sendPresenceUpdate('composing', m.chat)
+export async function before(m, { isAdmin, isBotAdmin }) {
+  if (m.isBaileys) return false;
+  let chat = global.db.data.chats[m.chat] || { autoPresence: false }
+  if (chat.autoPresence) {
+    const data = global.plugins;
+    const datas = Object.values(data).map(({ tags, command }) => ({ tags, command }));
+    const q = removeFirstLetter(m.text);
+    for (const item of datas) {
+      if (item.tags && item.command !== undefined) {
+        const text = q.trim().toLowerCase();
+        if (item.command instanceof RegExp) {
+          if (item.command.test(text)) {
+            this.sendPresenceUpdate('composing', m.chat)
+          } else {
+          this.sendPresenceUpdate('available', m.chat)
+          }
+        } else if (Array.isArray(item.command)) {
+          for (const cmd of item.command) {
+            const regex = new RegExp('^' + cmd + '$', 'i');
+            if (regex.test(text)) {
+              this.sendPresenceUpdate('composing', m.chat)
             } else {
-                /* Tandai bahwa ada teks di m.chat untuk menghindari tampilan ulang presence */
-                typing[m.sender] = setTimeout(() => {
-                    delete typing[m.sender]
-                    /* Presence (Recording) dihapus karena tidak ada teks baru */
-                    this.sendPresenceUpdate('recording', m.chat)
-                }, 3000) // Sesuaikan dengan waktu yang diinginkan (dalam milidetik)
-            }
+          this.sendPresenceUpdate('available', m.chat)
+          }
+          }
         }
+      }
     }
+  }
 }
 
-export const disabled = false
+function removeFirstLetter(word) {
+  if (typeof word !== 'string' || word.length === 0) {
+    return ""; // Return an empty string if the input is not a non-empty string
+  }
+
+  return word.substring(1); // Return the substring starting from index 1 (omitting the first letter)
+}

@@ -11,7 +11,6 @@ import {
     instagram,
     komikuId,
     music,
-    nhentai,
     nineApps,
     otakudesu,
     photofunia,
@@ -43,7 +42,6 @@ let handler = async (m, {
         "instagram",
         "komikuId",
         "music",
-        "nhentai",
         "nineApps",
         "otakudesu",
         "photofunia",
@@ -205,23 +203,7 @@ let handler = async (m, {
             let outs = await music(inputs)
             throw outs
         }
-        if (feature == "nhentai") {
-            let nht = [
-                "search",
-                "detail"
-            ]
-            if (!nht.includes(inputs)) return m.reply("*Example:*\n.fs youtube.search.hello\n\n*Pilih type yg ada*\n" + nht.map((v, index) => "  ○ " + v).join('\n'))
-            if (inputs == "search") {
-                await m.reply(wait)
-                let outs = await nhentai.search(inputs_)
-                throw outs
-            }
-            if (inputs == "detail") {
-                await m.reply(wait)
-                let outs = await nhentai.detail(inputs_)
-                throw outs
-            }
-        }
+        
         if (feature == "nineApps") {
             let napp = [
                 "search",

@@ -1,3 +1,4 @@
+
 export async function before(m, { isAdmin, isBotAdmin }) {
   if (m.key.remoteJid != 'status@broadcast') return false;
 

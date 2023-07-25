@@ -1,64 +1,52 @@
+import cheerio from 'cheerio'
 import fetch from 'node-fetch'
 
 const cooldown = 300000
-let handler = async (m, { usedPrefix }) => {
-let ke = await fetch('https://random-data-api.com/api/v2/addresses')
-let v = await ke.json()
-let imgr = flaaa.getRandom()
+let handler = async (m, {
+    usedPrefix
+}) => {
+    let imgr = flaaa.getRandom()
+
     let user = global.db.data.users[m.sender]
     let timers = (cooldown - (new Date - user.lastadventure))
     if (user.health < 80) return conn.sendFile(m.chat, imgr + 'lowhealth', '',
-`${htki} LOW HEALTH ${htka}\nʏᴏᴜʀ ʜᴇᴀʟᴛʜ ɪs ʙᴇʟᴏᴡ 80﹗
+        `${htki} LOW HEALTH ${htka}\nʏᴏᴜʀ ʜᴇᴀʟᴛʜ ɪs ʙᴇʟᴏᴡ 80﹗
 ᴩʟᴇᴀsᴇ ʜᴇᴀʟ ❤ ғɪʀsᴛ ᴛᴏ ᴀᴅᴠᴇɴᴛᴜʀᴇ ᴀɢᴀɪɴ.`.trim(), m)
     if (new Date - user.lastadventure <= cooldown) return conn.sendFile(m.chat, imgr + 'cooldown', '',
-`${htki} COOLDOWN ${htka}\nʏᴏᴜ'ᴠᴇ ᴀʟʀᴇᴀᴅʏ *ᴀᴅᴠᴇɴᴛᴜʀᴇ*, ᴩʟᴇᴀsᴇ ᴡᴀɪᴛ ᴛɪʟʟ ᴄᴏᴏʟᴅᴏᴡɴ ғɪɴɪsʜ.
+        `${htki} COOLDOWN ${htka}\nʏᴏᴜ'ᴠᴇ ᴀʟʀᴇᴀᴅʏ *ᴀᴅᴠᴇɴᴛᴜʀᴇ*, ᴩʟᴇᴀsᴇ ᴡᴀɪᴛ ᴛɪʟʟ ᴄᴏᴏʟᴅᴏᴡɴ ғɪɴɪsʜ.
 
 ⏱️ ${timers.toTimeString()}`.trim(), m)
     const rewards = reward(user)
-    let text = `🔖 ᴀᴅᴠᴇɴᴛᴜʀᴇ ᴛᴏ *${v.street_name}*
+    const info = await getInfoNegaraAcak()
+    let teks = `🔖 ᴀᴅᴠᴇɴᴛᴜʀᴇ ᴛᴏ *${info.nama}*
 
 ${cmenut}
-${cmenub} *building number:* ${v.building_number}
-${cmenub} *city:* ${v.city}
-${cmenub} *uid:* ${v.uid}
-${cmenub} *city prefix:* ${v.city_prefix}
-${cmenub} *city suffix:* ${v.city_suffix}
-${cmenub} *community:* ${v.community}
-${cmenub} *country:* ${v.country}
-${cmenub} *country code:* ${v.country_code}
-${cmenub} *full address:* ${v.full_address}
-${cmenub} *id:* ${v.id}
-${cmenub} *latitude:* ${v.latitude}
-${cmenub} *longitude:* ${v.longitude}
-${cmenub} *mail box:* ${v.mail_box}
-${cmenub} *postcode:* ${v.postcode}
-${cmenub} *secondary address:* ${v.secondary_address}
-${cmenub} *state:* ${v.state}
-${cmenub} *state abbr:* ${v.state_abbr}
-${cmenub} *street address:* ${v.street_address}
-${cmenub} *street name:* ${v.street_name}
-${cmenub} *street suffix:* ${v.street_suffix}
-${cmenub} *time zone:* ${v.time_zone}
-${cmenub} *zip:* ${v.zip}
-${cmenub} *zip code:* ${v.zip_code}
+${cmenub} *Nama resmi:* ${info.namaResmi}
+${cmenub} *Wilayah:* ${info.wilayah}
+${cmenub} *Subwilayah:* ${info.subwilayah}
+${cmenub} *Zona waktu:* ${info.zonaWaktu.join(', ')}
+${cmenub} *Bendera:* ${info.bendera}
+${cmenub} *Populasi:* ${info.populasi}
 ${cmenuf}
 
 ᴀᴅᴠᴇɴᴛᴜʀᴇ ғɪɴɪsʜ (. ❛ ᴗ ❛.)
 ${cmenua}`
-    for (const lost in rewards.lost) if (user[lost]) {
-        const total = rewards.lost[lost].getRandom()
-        user[lost] -= total * 1
-        if (total) text += `\n${global.rpg.emoticon(lost)}${lost}: ${total}`
-    }
-    text += '\n\n🔖 ᴀᴅᴠᴇɴᴛᴜʀᴇ ʀᴇᴡᴀʀᴅ ʀᴇᴄᴇɪᴠᴇᴅ :'
-    for (const rewardItem in rewards.reward) if (rewardItem in user) {
-        const total = rewards.reward[rewardItem].getRandom()
-        user[rewardItem] += total * 1
-        if (total) text += `\n⮕ ${global.rpg.emoticon(rewardItem)}${rewardItem}: ${total}`
-    }
-    conn.sendFile(m.chat, `https://static-maps.yandex.ru/1.x/?lang=id-ID&ll=${v.longitude},${v.latitude}&z=12&l=map&size=600,300`, '',
-    `${htki} ADVENTURE ${htka}\n` +
-    text.trim(), m)
+    for (const lost in rewards.lost)
+        if (user[lost]) {
+            const total = rewards.lost[lost].getRandom()
+            user[lost] -= total * 1
+            if (total) teks += `\n${global.rpg.emoticon(lost)}${lost}: ${total}`
+        }
+    teks += '\n\n🔖 ᴀᴅᴠᴇɴᴛᴜʀᴇ ʀᴇᴡᴀʀᴅ ʀᴇᴄᴇɪᴠᴇᴅ :'
+    for (const rewardItem in rewards.reward)
+        if (rewardItem in user) {
+            const total = rewards.reward[rewardItem].getRandom()
+            user[rewardItem] += total * 1
+            if (total) teks += `\n⮕ ${global.rpg.emoticon(rewardItem)}${rewardItem}: ${total}`
+        }
+    conn.sendFile(m.chat, info.urlGambarOg, '',
+        `${htki} ADVENTURE ${htka}\n` +
+        teks.trim(), m)
     user.lastadventure = new Date * 1
 }
 handler.help = ['adventure']
@@ -69,6 +57,34 @@ handler.cooldown = cooldown
 handler.disabled = false
 
 export default handler
+
+async function getInfoNegaraAcak() {
+    try {
+        const response = await fetch('https://restcountries.com/v3.1/all');
+        const data = await response.json();
+        const indeksAcak = Math.floor(Math.random() * data.length);
+        const negara = data[indeksAcak];
+        const html = await (await fetch(negara.maps.googleMaps)).text();
+        const $ = cheerio.load(html);
+        const ogImageURL = $('meta[property="og:image"]').attr('content');
+
+        const info = {
+            nama: negara.name.common,
+            namaResmi: negara.name.official,
+            wilayah: negara.region,
+            subwilayah: negara.subregion,
+            zonaWaktu: negara.timezones,
+            bendera: negara.flag,
+            populasi: negara.population,
+            urlGambarOg: ogImageURL
+        };
+
+        return info;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
 
 function reward(user = {}) {
     let rewards = {

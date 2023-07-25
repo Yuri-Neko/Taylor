@@ -1,13 +1,13 @@
 const jobs = {
-    ojek: [{ name: 'Ojek', task: '🛵 Mengantarkan penumpang', difficulty: pickRandom(['Noob', 'Easy', 'Normal']), money: randomMoney(10, 4000), exp: 15 }],
-    pedagang: [{ name: 'Pedagang', task: '🛒 Mencari pembeli', difficulty: pickRandom(['Noob', 'Easy', 'Normal']), money: randomMoney(20, 2500), exp: 25 }],
-    dokter: [{ name: 'Dokter', task: '💉 Merawat pasien', difficulty: pickRandom(['Easy', 'Normal', 'Hard']), money: randomMoney(50, 9500), exp: 40 }],
-    petani: [{ name: 'Petani', task: '🌾 Menanam dan memanen tanaman', difficulty: pickRandom(['Noob', 'Easy', 'Normal']), money: randomMoney(62, 5200), exp: 30 }],
-    montir: [{ name: 'Montir', task: '🔧 Memperbaiki kendaraan', difficulty: pickRandom(['Easy', 'Normal', 'Hard']), money: randomMoney(20, 4200), exp: 20 }],
-    kuli: [{ name: 'Kuli', task: '🏋️ Membantu proyek konstruksi', difficulty: 'Extreme', money: randomMoney(70, 7800), exp: 50 }],
-    gamer: [{ name: 'Gamer', task: '🎮 Main game dan streaming', difficulty: pickRandom(['Noob', 'Easy', 'Normal', 'Hard']), money: randomMoney(5, 10000), exp: 10 }],
-    teacher: [{ name: 'Teacher', task: '👩‍🏫 Mengajar dan memberi pembelajaran', difficulty: pickRandom(['Noob', 'Easy', 'Normal', 'Hard']), money: randomMoney(30, 8000), exp: 35 }],
-    designer: [{ name: 'Graphic Designer', task: '🎨 Membuat desain grafis', difficulty: pickRandom(['Easy', 'Normal', 'Hard']), money: randomMoney(40, 6000), exp: 28 }],
+    ojek: [{ name: 'Ojek', task: '🛵 Mengantarkan penumpang', difficulty: pickRandom(['Noob', 'Easy', 'Normal']), money: randomMoney(500000, 1), exp: 15 }],
+    pedagang: [{ name: 'Pedagang', task: '🛒 Mencari pembeli', difficulty: pickRandom(['Noob', 'Easy', 'Normal']), money: randomMoney(500000, 1), exp: 25 }],
+    dokter: [{ name: 'Dokter', task: '💉 Merawat pasien', difficulty: pickRandom(['Easy', 'Normal', 'Hard']), money: randomMoney(500000, 1), exp: 40 }],
+    petani: [{ name: 'Petani', task: '🌾 Menanam dan memanen tanaman', difficulty: pickRandom(['Noob', 'Easy', 'Normal']), money: randomMoney(500000, 1), exp: 30 }],
+    montir: [{ name: 'Montir', task: '🔧 Memperbaiki kendaraan', difficulty: pickRandom(['Easy', 'Normal', 'Hard']), money: randomMoney(500000, 1), exp: 20 }],
+    kuli: [{ name: 'Kuli', task: '🏋️ Membantu proyek konstruksi', difficulty: 'Extreme', money: randomMoney(500000, 1), exp: 50 }],
+    gamer: [{ name: 'Gamer', task: '🎮 Main game dan streaming', difficulty: pickRandom(['Noob', 'Easy', 'Normal', 'Hard']), money: randomMoney(500000, 1), exp: 10 }],
+    teacher: [{ name: 'Teacher', task: '👩‍🏫 Mengajar dan memberi pembelajaran', difficulty: pickRandom(['Noob', 'Easy', 'Normal', 'Hard']), money: randomMoney(500000, 1), exp: 35 }],
+    designer: [{ name: 'Graphic Designer', task: '🎨 Membuat desain grafis', difficulty: pickRandom(['Easy', 'Normal', 'Hard']), money: randomMoney(500000, 1), exp: 28 }],
 };
 
 const taskInformation = {
@@ -85,11 +85,11 @@ let handler = async (m, { conn, command, args, usedPrefix }) => {
     conn.lastWorkTime = conn.lastWorkTime ? conn.lastWorkTime : {};
 
     if (/kerja|work/i.test(command)) {
-        const jobFields = Object.keys(jobs).map((field, index) => `${index + 1}. ${field}`).join('\n');
-        if (!type) throw `Pilih bidang pekerjaan yang sesuai:\n${jobFields}`;
+        const jobFields = Object.keys(jobs).map((field, index) => `*${index + 1}.* ${field}`).join('\n');
+        if (!type) throw `ℹ️ Pilih bidang pekerjaan yang sesuai:\n${jobFields}\n\nContoh: ketik *${usedPrefix + command} petani* untuk bekerja pertanian`;
 
         let jobData = jobs[type]?.[Math.floor(Math.random() * jobs[type]?.length)];
-        if (!jobData) throw '😅 Pekerjaan tidak ditemukan. Silakan pilih bidang pekerjaan yang sesuai dari daftar berikut:\n' + jobFields;
+        if (!jobData) throw '😅 Pekerjaan tidak ditemukan. Silakan pilih bidang pekerjaan yang sesuai dari daftar berikut:\n' + jobFields + `\nKetik: *${usedPrefix + command}petani*`;
 
         const penaltyChance = Math.random() < 0.5; // 50% chance of getting penalized
 
@@ -98,17 +98,17 @@ let handler = async (m, { conn, command, args, usedPrefix }) => {
             throw `😴 Kamu sudah bekerja, saatnya istirahat selama\n${clockString(remainingTime)}`;
         }
 
-        const earnedMoney = jobData.money * (jobData.difficulty === 'Extreme' ? 3 : jobData.difficulty === 'Hard' ? 2 : 1);
-        const earnedExp = jobData.exp;
+        const earnedMoney = jobData.money * (jobData.difficulty === 'Extreme' ? 3 : jobData.difficulty === 'Hard' ? 2 : 1) * 10;
+        const earnedExp = jobData.exp * 10;
         user.money = (user.money || 0) + earnedMoney;
         user.exp = (user.exp || 0) + earnedExp;
         conn.lastWorkTime[m.sender] = timeNow;
 
         const taskInfo = pickRandom(taskInformation[jobData.task]);
         const randomMessage = pickRandom([
-            `👷 Kamu ${jobData.name} dan sedang ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney * 1000)}*\n🔼 Dapatkan *${earnedExp * 1000}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
-            `🔧 Sebagai ${jobData.name}, tugasmu adalah ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney * 1000)}*\n🔼 Dapatkan *${earnedExp * 1000}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
-            `🚜 Sebagai seorang ${jobData.name}, tugasmu adalah ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney * 1000)}*\n🔼 Dapatkan *${earnedExp * 1000}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
+            `👷 Kamu ${jobData.name} dan sedang ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney)}*\n🔼 Dapatkan *${earnedExp}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
+            `🔧 Sebagai ${jobData.name}, tugasmu adalah ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney)}*\n🔼 Dapatkan *${earnedExp}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
+            `🚜 Sebagai seorang ${jobData.name}, tugasmu adalah ${jobData.task}\nTingkat Kesulitan: ${jobData.difficulty}\n\n💰 Mendapatkan uang senilai *${formatRupiah(earnedMoney)}*\n🔼 Dapatkan *${earnedExp}* EXP\nℹ️ Info Tambahan: ${taskInfo}`,
         ]);
 
         m.reply(randomMessage);

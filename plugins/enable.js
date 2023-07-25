@@ -8,7 +8,7 @@ const handler = async (m, {
     const idop = [
         "antiDelete", "antiLink", "antiLinkFb", "antiLinkHttp", "antiLinkIg", "antiLinkTel",
         "antiLinkTik", "antiLinkWa", "antiLinkYt", "antiSatir", "antiSticker", "antiVirtex", "antiToxic",
-        "antibule", "autoBio", "autoJoin", "autoPesence", "autoReply", "autoSticker", "autoVn", "viewStory",
+        "antibule", "autoBio", "autoJoin", "autoPresence", "autoReply", "autoSticker", "autoVn", "viewStory",
         "bcjoin", "getmsg", "nsfw", "antiSpam", "simi", "updateAnime", "updateAnimeNews",
         "viewonce", "welcome", "autoread", "gconly", "nyimak", "pconly", "self", "swonly"
     ]
@@ -100,9 +100,9 @@ handler.before = async (m, {
     }
 }
 
-handler.help = ["options", "setting", "feature"]
+handler.help = ["options", "setting"]
 handler.tags = ["main"]
-handler.command = /^(options|setting|feature)$/i
+handler.command = /^(options|setting|opt)$/i
 handler.limit = true
 
 export default handler

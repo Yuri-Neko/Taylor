@@ -1,53 +1,52 @@
-import fetch from 'node-fetch'
-import fs from 'fs'
+import fetch from 'node-fetch';
+import fs from 'fs';
 
 let handler = async (m, { conn, args, usedPrefix, DevMode }) => {
   try {
-    global.DATABASE.data.users[m.sender].lastbansos = global.db.data.users[m.sender].lastbansos || 0
-    let randomaku = `${Math.floor(Math.random() * 101)}`.trim()
-    let randomkamu = `${Math.floor(Math.random() * 81)}`.trim() //hehe Biar Susah Menang :v
-    let Aku = (randomaku * 1)
-    let Kamu = (randomkamu * 1)
-    let kbansos = 'https://telegra.ph/file/afcf9a7f4e713591080b5.jpg'
-    let mbansos = 'https://telegra.ph/file/d31fcc46b09ce7bf236a7.jpg'
-    let botol = global.wm
-    //let name = conn.getName[m.sender]
-    let __timers = (new Date - global.db.data.users[m.sender].lastbansos)
-    let _timers = (604800000 - __timers) 
-    let timers = clockString(_timers)
-    let user = global.db.data.users[m.sender]
-    if (new Date - global.db.data.users[m.sender].lastbansos > 300000) {
-      if (Aku > Kamu) {
-        conn.sendFile( m.chat, kbansos, 'b.jpg', `Kamu Tertangkap Setelah Kamu korupsi dana bansos🕴️💰,  Dan kamu harus membayar denda 3 Juta rupiah💵`, m)
-        user.money -= 3000000
-        global.db.data.users[m.sender].lastbansos = new Date * 1
-      } else if (Aku < Kamu) {
-        user.money += 3000000
-        conn.sendFile(m.chat, mbansos, 'b.jpg', `Kamu berhasil  korupsi dana bansos🕴️💰,  Dan kamu mendapatkan 3 Juta rupiah💵`, m)
-        global.db.data.users[m.sender].lastbansos = new Date * 1
-      } else {
-        conn.reply(m.chat, `Sorry Gan Lu g Berhasil Korupsi bansos Dan Tidak masuk penjara karna kamu *melarikan diri🏃*`, m)
-        global.db.data.users[m.sender].lastbansos = new Date * 1
-      }
-    } else conn.reply(m.chat, `Kamu sudah Melakukan Korupsi Bansos 💰\nDan kamu harus menunggu selama agar bisa korupsi bansos kembali \n▸ 🕓 ${timers}`, m)
-  } catch (e) {
-    throw `Kok erorr`
-  }
-}
+    let u = global.db.data.users[m.sender];
+    u.lastbansos = u.lastbansos || 0;
+    let Aku = `${Math.floor(Math.random() * 101)}`.trim();
+    let Kamu = `${Math.floor(Math.random() * 81)}`.trim(); // Menantang 😏
+    let A = (Aku * 1);
+    let K = (Kamu * 1);
+    let kb = 'https://telegra.ph/file/afcf9a7f4e713591080b5.jpg';
+    let mb = 'https://telegra.ph/file/d31fcc46b09ce7bf236a7.jpg';
+    let t = (new Date - u.lastbansos);
+    let timers = clockString(604800000 - t);
 
-handler.help = ['bansos']
-handler.tags = ['rpg']
-handler.command = /^(bansos|korupsi)$/i
-handler.group = true
-export default handler
+    if (t > 300000) {
+      if (A > K) {
+        conn.sendFile(m.chat, kb, 'b.jpg', `*Kamu Tertangkap!* Korupsi dana bansos 🕴️💰, Denda *3 Juta* rupiah 💵`, m);
+        u.money -= 3000000;
+        u.lastbansos = new Date * 1;
+      } else if (A < K) {
+        u.money += 3000000;
+        conn.sendFile(m.chat, mb, 'b.jpg', `*Berhasil Korupsi!* Dana bansos 🕴️💰, Dapatkan *3 Juta* rupiah 💵`, m);
+        u.lastbansos = new Date * 1;
+      } else {
+        conn.reply(m.chat, `*Maaf!* Kamu tidak berhasil melakukan korupsi bansos dan kamu tidak akan masuk penjara karena kamu *melarikan diri* 🏃`, m);
+        u.lastbansos = new Date * 1;
+      }
+    } else conn.reply(m.chat, `*Sudah Melakukan Korupsi!* 💰\nHarus menunggu selama agar bisa korupsi bansos kembali\n▸ 🕓 ${timers}`, m);
+  } catch (e) {
+    throw `Terjadi kesalahan`;
+  }
+};
+
+handler.help = ['bansos'];
+handler.tags = ['rpg'];
+handler.command = /^(bansos|korupsi)$/i;
+handler.group = true;
+export default handler;
 
 function pickRandom(list) {
-    return list[Math.floor(Math.random() * list.length)]
+  return list[Math.floor(Math.random() * list.length)];
 }
+
 function clockString(ms) {
-  let d = isNaN(ms) ? '--' : Math.floor(ms / 86400000)
-  let h = isNaN(ms) ? '--' : Math.floor(ms / 3600000) % 24
-  let m = isNaN(ms) ? '--' : Math.floor(ms / 60000) % 60
-  let s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60
-  return ['\n' + d, ' *Days ☀️*\n ', h, ' *Hours 🕐*\n ', m, ' *Minute ⏰*\n ', s, ' *Second ⏱️* '].map(v => v.toString().padStart(2, 0)).join('')
+  let d = isNaN(ms) ? '--' : Math.floor(ms / 86400000);
+  let h = isNaN(ms) ? '--' : Math.floor(ms / 3600000) % 24;
+  let m = isNaN(ms) ? '--' : Math.floor(ms / 60000) % 60;
+  let s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60;
+  return ['\n*' + d + '* _Hari_ ☀️\n ', '*' + h + '* _Jam_ 🕐\n ', '*' + m + '* _Menit_ ⏰\n ', '*' + s + '* _Detik_ ⏱️ '].map(v => v.toString().padStart(2, 0)).join('');
 }
